@@ -58,7 +58,7 @@ public class Window {
 			} else if (size == 3) {
 				draw("completedReal.png", 0, 0, 0, true);
 			} else if (size == 4) {
-				draw("president.png", 0, 0, 0, true);
+				draw("president.jpg", 0, 0, 0, true);
 			}
 		}
 	}
@@ -80,7 +80,7 @@ public class Window {
 			} else if (size == 3) {
 				draw("completed.png", 0, 0, 0, true);
 			} else if (size == 4) {
-				draw("president.png", 0, 0, 0, true);
+				draw("president.jpg", 0, 0, 0, true);
 			}
 		}
 		roundBeingPlayed = roundSent;
@@ -578,21 +578,21 @@ public class Window {
 				main.clearCardsPlayed();
 				if (nameInput1.getText().equals("Enter Player 1's name here...") || nameInput1.getText().equals("")) {
 					namesCompletelyEntered = false;
-					main.draw("redArrow.png", 360, 365, 34, false);
+					main.draw("redArrow.png", 780, 360, 34, false);
 				}
 				if (nameInput2.getText().equals("Enter Player 2's name here...") || nameInput2.getText().equals("")) {
 					namesCompletelyEntered = false;
-					main.draw("redArrow.png", 360, 385, 34, false);
+					main.draw("redArrow.png", 780, 380, 34, false);
 
 				}
 				if (nameInput3.getText().equals("Enter Player 3's name here...") || nameInput3.getText().equals("")) {
 					namesCompletelyEntered = false;
-					main.draw("redArrow.png", 360, 405, 34, false);
+					main.draw("redArrow.png", 780, 400, 34, false);
 
 				}
 				if (nameInput4.getText().equals("Enter Player 4's name here...") || nameInput4.getText().equals("")) {
 					namesCompletelyEntered = false;
-					main.draw("redArrow.png", 360, 425, 34, false);
+					main.draw("redArrow.png", 780, 420, 34, false);
 
 				}
 				if (namesCompletelyEntered) {
