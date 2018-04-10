@@ -1,10 +1,11 @@
+package Cards;
 import java.util.ArrayList;
 import java.*;
 
 public class Deck {
 	private ArrayList<Card> deck = new ArrayList();
 	
-	Deck(){
+	public Deck(){
 		Card addCard;
 		for (int suitCounter=1; suitCounter<=4; suitCounter++){
 			for (int cardCounter=2; cardCounter<=14; cardCounter++){

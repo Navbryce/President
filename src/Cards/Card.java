@@ -1,4 +1,4 @@
-
+package Cards;
 public class Card {
 	final int hearts=1;
 	final int spades=2;
@@ -16,7 +16,7 @@ public class Card {
 	private boolean isFinalCardPlayed=false;
 	
 	
-	Card(int cardValue, int suitValue){
+	public Card(int cardValue, int suitValue){
 		value=cardValue;
 		suit=suitValue;
 	}

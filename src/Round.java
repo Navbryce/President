@@ -8,6 +8,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+
+import Cards.Card;
+import Cards.Deck;
+import Players.Player;
 public class Round {
 private int numberOfPlayers=4;
 	private ArrayList <Card> player1=new ArrayList();
@@ -23,6 +27,7 @@ private int numberOfPlayers=4;
 	private String p2;
 	private String p3;
 	private String p4;
+	private Player[] players;
 	private EventLog mainLog;
 	private boolean finalCardPlayedByPlayer=false;
 	private AtomicBoolean reselectMB = new AtomicBoolean(true);
@@ -34,12 +39,13 @@ private int numberOfPlayers=4;
 	private Deck mainDeck = new Deck();
 	private Window main;
 	
-	Round(int[] previousFinished, String player1Name, String player2Name, String player3Name, String player4Name, String rootPath){
+	Round(int[] previousFinished, String player1Name, String player2Name, String player3Name, String player4Name, Player[] playerObjects, String rootPath){
 		main = new Window(0, this, rootPath);
 		p1 = player1Name;
 		p2 = player2Name;
 		p3 = player3Name;
 		p4 = player4Name;
+		players = playerObjects;
 		main.addMenu();
 		createHands();
 		mainLog = new EventLog();
@@ -451,7 +457,13 @@ private int numberOfPlayers=4;
 		}
 
 	}
-	public void createHands(){ //Runs the various methods for hand generation 
+	public void createHands(){ //Runs the various methods for hand generation
+		/*for (Player player: players) {
+			ArrayList<Card> hand = new ArrayList();
+			addHand(hand);
+			player.hand = sortHand(hand);
+		}
+		*/
 		addHand(player1);
 		player1=sortHand(player1);
 		addHand(player2);

@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.*;
 
+import Cards.Card;
+
 import java.util.ArrayList;
 
 public class Window {
@@ -477,7 +479,8 @@ public class Window {
 			result += " ";
 		}
 		String[] backgroundOptions = { "Default", "Windows", "Puppy", "Cats", "Snow", "Rain", "Space", "Valley" };
-		String[] reselectOptions = { "On", "Off" };
+		String[] reselectOptions = { "Off", "On" };
+		roundBeingPlayed.toggleReselect(false); // Off by default
 		JComboBox backgroundList = new JComboBox(backgroundOptions);
 		JComboBox reselectMenu = new JComboBox(reselectOptions);
 		reselectMenu.addActionListener(reselectAbility);
