@@ -26,7 +26,7 @@ public class Etre {
 		setNames(nameInput.getNames());
 		nameInput.disposeWindow();
 		do{
-			currentRound=new Round(finishedArray, p1, p2, p3, p4, players, rootPath);
+			currentRound=new Round(finishedArray, players, rootPath);
 			finishedArray=currentRound.getFinishedArray();
 			continueWindow = new Window(3, rootPath);
 			completedGame=continueWindow.continueScreen(getNamesRanksList());

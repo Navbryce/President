@@ -91,7 +91,6 @@ public class Window {
 
 	public void draw(String fileName, int xLocation, int yLocation, int layer, boolean inHand) {
 		String path = rootPath + fileName;
-		System.out.println(path);
 		// String path="F:\\Computer Science 3-AP\\Unit2Part3\\Pictures\\" +
 		// fileName;
 		ImageIcon picture = new ImageIcon(Toolkit.getDefaultToolkit().createImage(path));

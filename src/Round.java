@@ -11,22 +11,15 @@ import javax.swing.JLayeredPane;
 
 import Cards.Card;
 import Cards.Deck;
+import Players.ComputerPlayer;
 import Players.Player;
 public class Round {
-private int numberOfPlayers=4;
-	private ArrayList <Card> player1=new ArrayList();
-	private ArrayList <Card> player2=new ArrayList();
-	private ArrayList <Card> player3=new ArrayList();
-	private ArrayList <Card> player4=new ArrayList();
+	private int numberOfPlayers=4;
 	private ArrayList <Card> playedDeck=new ArrayList();
 	private int currentTurnNumber=1;
 	private Card lastCardPlayed;
 	ArrayList<Card> everyValueHand;
 	PictureJLayeredPane eventLogHolder;
-	private String p1;
-	private String p2;
-	private String p3;
-	private String p4;
 	private Player[] players;
 	private EventLog mainLog;
 	private boolean finalCardPlayedByPlayer=false;
@@ -39,12 +32,8 @@ private int numberOfPlayers=4;
 	private Deck mainDeck = new Deck();
 	private Window main;
 	
-	Round(int[] previousFinished, String player1Name, String player2Name, String player3Name, String player4Name, Player[] playerObjects, String rootPath){
+	Round(int[] previousFinished, Player[] playerObjects, String rootPath){
 		main = new Window(0, this, rootPath);
-		p1 = player1Name;
-		p2 = player2Name;
-		p3 = player3Name;
-		p4 = player4Name;
 		players = playerObjects;
 		main.addMenu();
 		createHands();
@@ -155,31 +144,42 @@ private int numberOfPlayers=4;
 		}
 		return playableCard;
 	}
-	public ArrayList playerFind(int turnNumber){
-		ArrayList <Card> handArray;
-		if(turnNumber==1){
-			handArray=player1;
-		}else if(turnNumber==2){
-			handArray=player2;
-		}else if(turnNumber==3){
-			handArray=player3;
-		}else{
-			handArray=player4;
+	/**
+	 * 
+	 * @param turnNumber - index of player + 1. player 4 could be turn number 4 or 0
+	 * @return  player
+	 */
+	public Player player(int turnNumber){
+		if (turnNumber <= 0 || turnNumber > 3) {
+			turnNumber = 4;
+			System.out.println("WARNING: Default to player 4.");
 		}
-		return handArray;
+		return players[turnNumber - 1];
 	}
-	public String findName(int turnNumber){
-		String name;
-		if(turnNumber==1){
-			name=p1;
-		}else if(turnNumber==2){
-			name=p2;
-		}else if(turnNumber==3){
-			name=p3;
-		}else{
-			name=p4;
+	/**
+	 * 
+	 * @param turnNumber - index of player + 1. player 4 could be turn number 4 or 0
+	 * @return hand of player
+	 */
+	public ArrayList playerFind(int turnNumber){
+		if (turnNumber <= 0 || turnNumber > 3) {
+			turnNumber = 4;
+			System.out.println("WARNING: Default to player 4.");
 		}
-		return name;
+		return players[turnNumber - 1].hand;
+	}
+	
+	/**
+	 * 
+	 * @param turnNumber - index of player + 1
+	 * @return name
+	 */
+	public String findName(int turnNumber){
+		if (turnNumber <= 0 || turnNumber > 3) {
+			turnNumber = 4;
+			System.out.println("WARNING: Default to player 4.");
+		}
+		return players[turnNumber - 1].getName();
 	}
 	public void printHand(int turnNumber){
 		System.out.println("Your(" + findName(turnNumber)+"'s) hand is: ");
@@ -198,7 +198,7 @@ private int numberOfPlayers=4;
 		hand=playerFind(currentTurnNumber);
 		lastCardPlayed=new Card(1, 1);
 		new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
-			do{
+		do{
 				System.out.print("Please select the number of cards you want to play, " + findName(currentTurnNumber) + ": ");
 				boolean messageBoxVariable=false;
 				main.setMessageBox(messageBoxVariable);
@@ -319,6 +319,15 @@ private int numberOfPlayers=4;
 		return sortedHand;
 		
 	}
+	/**
+	 * Sorts everybody's hands
+	 */
+	public void sortHands () {
+		for (Player player: players) {
+			sortHand(player.hand);
+		}
+	}
+	
 	public ArrayList sortPivots(ArrayList<Card> hand){ //Bubble Sort
 		for(int elementCounter1=0; elementCounter1<hand.size(); elementCounter1++){
 			for(int elementCounter2=0; elementCounter2<hand.size()-1; elementCounter2++){
@@ -337,6 +346,7 @@ private int numberOfPlayers=4;
 		Card cardBeingPlayed;
 		int valueIn;
 		boolean acceptableValue=false;
+		Player currentPlayer = player(currentTurnNumber);
 		hand=playerFind(currentTurnNumber);
 		Scanner inputValue = new Scanner(System.in);
 		playedDeckPrint();
@@ -346,20 +356,27 @@ private int numberOfPlayers=4;
 		main.drawHand(playerFind(currentTurnNumber));
 		do{
 			System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
-			boolean messageBoxVariable=false;
-			main.setMessageBox(messageBoxVariable);
-			do{
-				valueIn=main.mouseClick();
-				if(valueIn<hand.size()){
-					if(reselectMB.get()){
-						new MessageBox("You selected: " + hand.get(valueIn).getName(), true, main, 0);
+			if (currentPlayer.useGUI()) { // a human player needs to use the GUI
+				boolean messageBoxVariable=false;
+				main.setMessageBox(messageBoxVariable);
+				do{
+					valueIn=main.mouseClick();
+					if(valueIn<hand.size()){
+						if(reselectMB.get()){
+							new MessageBox("You selected: " + hand.get(valueIn).getName(), true, main, 0);
+						}else{
+							main.setMessageBox(true);
+						}
 					}else{
 						main.setMessageBox(true);
 					}
-				}else{
-					main.setMessageBox(true);
-				}
-			}while(!main.getMessageBox());
+				}while(!main.getMessageBox());
+			} else {
+				currentPlayer = (ComputerPlayer) currentPlayer;
+				ArrayList<Card> copyOfPlayedDeck = (ArrayList<Card>)playedDeck.clone(); // clone the played deck so the ai can't modify it
+				valueIn = ((ComputerPlayer)currentPlayer).playCard(copyOfPlayedDeck, numberOfCards);
+			}
+			
 			if(valueIn==hand.size()){
 				skipTurn=true;
 				mainLog.addLine(findName(currentTurnNumber) + ", has chosen to pass their turn. They did not play anything.");
@@ -458,20 +475,11 @@ private int numberOfPlayers=4;
 
 	}
 	public void createHands(){ //Runs the various methods for hand generation
-		/*for (Player player: players) {
+		for (Player player: players) {
 			ArrayList<Card> hand = new ArrayList();
 			addHand(hand);
 			player.hand = sortHand(hand);
 		}
-		*/
-		addHand(player1);
-		player1=sortHand(player1);
-		addHand(player2);
-		player2=sortHand(player2);
-		addHand(player3);
-		player3=sortHand(player3);
-		addHand(player4);
-		player4=sortHand(player4);
 	}
 	public void clearTable(){ //Is called when a player clears the table
 		String clearedTheTableString = findName(lastCardPlayed.getTurnPlayedOn()) + "'s " + numberOfCardsToPlay() + " of " + lastCardPlayed.getNameWithoutSuit() + " clears the table";
@@ -621,10 +629,8 @@ private int numberOfPlayers=4;
 		mainLog.addLine("The vice-president, " + findName(ranks[1]) + ", has traded two cards with his or her helper, " + findName(ranks[2]));
 		mainLog.addLine("The president, " + findName(ranks[0]) + ", goes first.");
 		eventLogHolder.updateSize();
-		player1=sortHand(player1);
-		player2=sortHand(player2);
-		player3=sortHand(player3);
-		player4=sortHand(player4);
+		
+		sortHands();
 	}
 	public void drawEveryValueOfCard(){
 		main.clearWindow();
