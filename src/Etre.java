@@ -5,29 +5,38 @@ import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import Players.ComputerPlayer;
 import Players.HumanPlayer;
 import Players.Player;
+import Players.RandomStrategy;
 public class Etre {
 	private int[] finishedArray={0,0,0,0};
-	private String p1 = "Player 1";
-	private String p2 = "Player 2";
-	private String p3 = "Player 3";
-	private String p4 = "Player 4";
 	private Player[] players = new Player[4];
+	private int[] scores = {0, 0, 0, 0};
 	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\";
+	private int numberOfGamesPlayed = 0;
 	public static void main(String args[]){
 		new Etre();
 	}
 	Etre(){
+		// Strategies
+		players[0] = new RandomStrategy("Random Strategy", null);
+		players[1] = new RandomStrategy("Random Strategy1", null);
+		players[2] = new RandomStrategy("Random Strategy2", null);
+		players[3] = new RandomStrategy("Random Strategy3", null);
+
+		
 		Round currentRound;
 		Window continueWindow;
 		boolean completedGame=false;
 		Window nameInput = new Window(4, rootPath);
-		setNames(nameInput.getNames());
+		setNames(nameInput.getNames(players));
 		nameInput.disposeWindow();
 		do{
+			numberOfGamesPlayed++;
 			currentRound=new Round(finishedArray, players, rootPath);
 			finishedArray=currentRound.getFinishedArray();
+			processScores(finishedArray); // Update scores
 			continueWindow = new Window(3, rootPath);
 			completedGame=continueWindow.continueScreen(getNamesRanksList());
 			continueWindow.disposeWindow();
@@ -40,22 +49,26 @@ public class Etre {
 		return userInput.nextBoolean();
 		
 	}
-	public String getName(int turnNumber){
-		String returnString;
-		if(turnNumber==1){
-			returnString = p1;
-		}else if(turnNumber==2){
-			returnString = p2;
-		}else if(turnNumber==3){
-			returnString = p3;
-		}else{
-			returnString = p4;
+	/**
+	 * 
+	 * @param turnNumber
+	 * @return converts turn number to index
+	 */
+	public int convertTurnNumber (int turnNumber) {
+		if(turnNumber <= 0 || turnNumber > 4){
+			turnNumber = 4;
 		}
-		return returnString;
+		return turnNumber - 1; // player 1 is at index 0
+	}
+	public Player player (int turnNumber){
+		return players[convertTurnNumber(turnNumber)];
+	}
+	public String getName (int turnNumber){
+		return(player(turnNumber).getName());
 	}
 	public ArrayList<String> getNamesRanksList(){
 		ArrayList<String> resultList = new ArrayList();
-		resultList.add("The Ranks are:");
+		resultList.add("The Ranks and Scores after " + numberOfGamesPlayed + " game(s) are:");
 		resultList.add("The President is: " + getName(finishedArray[0]));
 		resultList.add("The Vice-President is: " + getName(finishedArray[1]));
 		resultList.add("The Vice-President's Helper is: " + getName(finishedArray[2]));
@@ -63,16 +76,22 @@ public class Etre {
 		return resultList;
 	}
 	public void setNames(ArrayList<String> names){
-		p1=names.get(0);
-		p2=names.get(1);
-		p3=names.get(2);
-		p4=names.get(3);
-		
-		int playerCounter = 0;
-		for (String name: names) {
-			HumanPlayer player = new HumanPlayer(name, null);
-			players[playerCounter] = player;
-			playerCounter++;
+		for (int indexCounter = 0; indexCounter < players.length; indexCounter++) {
+			if (players[indexCounter] == null) { // if the player was not defined programatically, initialize it here with the name entered
+				players[indexCounter] = new HumanPlayer(names.get(indexCounter), null);
+			}
+		}
+	}
+	/**
+	 * 
+	 * @param finishedArray
+	 * Processes finished array and updates scores
+	 */
+	private void processScores (int[] finishedArray) {
+		for (int place = 0; place <= 3; place++) { // Iterate through the 4 possible places (pres, vp...)
+			int turnNumber = finishedArray[place];
+			int playerIndex = convertTurnNumber(turnNumber);
+			scores[playerIndex] += place; // 1st place is at 0 index. 2nd place is at 1 index. The lower the score, the better
 		}
 	}
 

@@ -11,6 +11,7 @@ import javax.swing.JLayeredPane;
 
 import Cards.Card;
 import Cards.Deck;
+import Cards.RoundStart;
 import Players.ComputerPlayer;
 import Players.Player;
 public class Round {
@@ -31,7 +32,7 @@ public class Round {
 	private int numberOfCards=1; //For example, 1 represents singles
 	private Deck mainDeck = new Deck();
 	private Window main;
-	
+
 	Round(int[] previousFinished, Player[] playerObjects, String rootPath){
 		main = new Window(0, this, rootPath);
 		players = playerObjects;
@@ -84,7 +85,7 @@ public class Round {
 
 		}while(finishedCounter<3);
 		completedGame();
-		
+
 	}
 	public void addHand(ArrayList <Card> hand){
 		for(int counter=0; counter<(52/4); counter++){
@@ -95,7 +96,7 @@ public class Round {
 		boolean playableCard=false;
 		ArrayList <Card> hand=playerFind(turnNumber);
 		for(int elementCounter=0; (elementCounter<hand.size()) && !playableCard; elementCounter++){
-			if(isPlayableCard(hand.get(elementCounter), turnNumber, false)){
+			if(isPlayableCard(hand.get(elementCounter), turnNumber, false, player(turnNumber))){
 				playableCard=true;
 			}
 		}
@@ -106,9 +107,9 @@ public class Round {
 			eventLogHolder.updateSize();
 		}
 		return playableCard;
-		
+
 	}
-	public boolean isPlayableCard(Card cardPlayed, int turnNumber, boolean infoA){
+	public boolean isPlayableCard(Card cardPlayed, int turnNumber, boolean infoA, Player player){
 		boolean playableCard=false;
 		boolean enoughCards=false;
 		ArrayList <Card> hand=playerFind(turnNumber);
@@ -125,7 +126,9 @@ public class Round {
 				playableCard=true;
 			}else if(infoA){
 				System.out.println("You do not have enough of this card to play.");
-				new MessageBox("You do not have enough of this card to play. Please try again.", false, main, 1);
+				if (player.useGUI()) {
+					new MessageBox("You do not have enough of this card to play. Please try again.", false, main, 1);
+				}
 
 			}
 		}else if(infoA){
@@ -140,7 +143,11 @@ public class Round {
 			if(cardCounter<numberOfCards){
 				numberOfCardsInHandResult=" And, you do not have enough of this card";
 			}
-			new MessageBox(cardPlayed.getName() + " is not high enough. Remember, it must be greater than or equal to " + lastCardPlayed.getName() +"." + numberOfCardsInHandResult, false, main, 2);
+			String message = cardPlayed.getName() + " is not high enough. Remember, it must be greater than or equal to " + lastCardPlayed.getName() +"." ;
+			System.out.println(message);
+			if (player.useGUI()) {
+				new MessageBox(message, false, main, 2);
+			}
 		}
 		return playableCard;
 	}
@@ -152,7 +159,7 @@ public class Round {
 	public Player player(int turnNumber){
 		if (turnNumber <= 0 || turnNumber > 3) {
 			turnNumber = 4;
-			System.out.println("WARNING: Default to player 4.");
+			// System.out.println("WARNING: Default to player 4.");
 		}
 		return players[turnNumber - 1];
 	}
@@ -162,31 +169,24 @@ public class Round {
 	 * @return hand of player
 	 */
 	public ArrayList playerFind(int turnNumber){
-		if (turnNumber <= 0 || turnNumber > 3) {
-			turnNumber = 4;
-			System.out.println("WARNING: Default to player 4.");
-		}
-		return players[turnNumber - 1].hand;
+		return(player(turnNumber).hand);
 	}
-	
+
 	/**
 	 * 
 	 * @param turnNumber - index of player + 1
 	 * @return name
 	 */
 	public String findName(int turnNumber){
-		if (turnNumber <= 0 || turnNumber > 3) {
-			turnNumber = 4;
-			System.out.println("WARNING: Default to player 4.");
-		}
-		return players[turnNumber - 1].getName();
+		return(player(turnNumber).getName());
 	}
 	public void printHand(int turnNumber){
-		System.out.println("Your(" + findName(turnNumber)+"'s) hand is: ");
+		/*System.out.println("Your(" + findName(turnNumber)+"'s) hand is: ");
 		ArrayList <Card> hand=playerFind(turnNumber);
 		for(int elementCounter=0; elementCounter<hand.size(); elementCounter++){
 			System.out.println(elementCounter + ". " + hand.get(elementCounter).getName());
 		}
+		*/
 	}
 	public void roundStart(){
 		ArrayList<Card> hand;
@@ -194,11 +194,15 @@ public class Round {
 		Scanner inputValue = new Scanner(System.in);
 		int valueIn;
 		boolean acceptableValue=false;
+		Player player = player(currentTurnNumber);
 		printHand(currentTurnNumber);
 		hand=playerFind(currentTurnNumber);
 		lastCardPlayed=new Card(1, 1);
-		new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
+		if (player.useGUI()) {
+			new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
+		}
 		do{
+			if (player.useGUI()) {
 				System.out.print("Please select the number of cards you want to play, " + findName(currentTurnNumber) + ": ");
 				boolean messageBoxVariable=false;
 				main.setMessageBox(messageBoxVariable);
@@ -210,6 +214,7 @@ public class Round {
 						main.setMessageBox(true);
 					}
 				}while(!main.getMessageBox());
+			}
 			if(numberOfCards==4621){
 				while(hand.size()!=0){
 					hand.remove(0);
@@ -218,26 +223,33 @@ public class Round {
 				hand.add(cardBeingPlayed);
 				acceptableValue=true;
 				numberOfCards=1;
-				
-			}else{
 
-				System.out.print("Please select which card(s) you want to play, using its corresponding number: ");
-				new MessageBox("Please select the card you want to play. You only need to select one", false, main, 1);
-				main.setMessageBox(false);
-				do{
-					valueIn=main.mouseClick();
-					if(reselectMB.get()){
-						new MessageBox("You selected: " + hand.get(valueIn).getName(), true, main, 1);
-					}else{
-						main.setMessageBox(true);
-					}
-				}while(!main.getMessageBox());
+			}else{
+				if (player.useGUI()) {
+					System.out.print("Please select which card(s) you want to play, using its corresponding number: ");
+					new MessageBox("Please select the card you want to play. You only need to select one", false, main, 1);
+					main.setMessageBox(false);
+					do{
+						valueIn=main.mouseClick();
+						if(reselectMB.get()){
+							new MessageBox("You selected: " + hand.get(valueIn).getName(), true, main, 1);
+						}else{
+							main.setMessageBox(true);
+						}
+					}while(!main.getMessageBox());
+				} else {
+					RoundStart roundStart = ((ComputerPlayer)player).startRound();
+					numberOfCards = roundStart.numberOfCards;
+					valueIn = roundStart.card;
+				}
 				if(valueIn<0 || valueIn>=hand.size()){
 					System.out.println("You did not enter an acceptable value. please try again.\n");
 					cardBeingPlayed=new Card(0, 1);
 				}else if(hand.get(valueIn).getValue()==2 && hand.size()>numberOfCardsOfValue(2, hand)){
 					System.out.println("You cannot use a two when no other cards have been played.");
-					new MessageBox("You can not use a two when no other cards have been played and said two is not your last card..", false, main, 1);
+					if (player.useGUI()) {
+						new MessageBox("You can not use a two when no other cards have been played and said two is not your last card..", false, main, 1);
+					}
 					cardBeingPlayed=new Card(0, 1);
 				}else{
 					cardBeingPlayed=hand.get(valueIn);
@@ -247,9 +259,9 @@ public class Round {
 					}
 				}
 			}
-		}while(!acceptableValue || !isPlayableCard(cardBeingPlayed, currentTurnNumber, acceptableValue));
+		}while(!acceptableValue || !isPlayableCard(cardBeingPlayed, currentTurnNumber, acceptableValue, player(currentTurnNumber)));
 		playCard(cardBeingPlayed, currentTurnNumber);
-		
+
 	}
 	public void playedDeckPrint(){
 		System.out.println("\nThe following cards have been played: ");
@@ -309,15 +321,15 @@ public class Round {
 		}
 		leftOfPivot=sortPivots(leftOfPivot); //After dividing the hand, it uses bubble sort
 		rightOfPivot=sortPivots(rightOfPivot); 
-			
+
 		for(int elementCounter=0; elementCounter<leftOfPivot.size(); elementCounter++){ //Adds the cards back to the hand
-				sortedHand.add(leftOfPivot.get(elementCounter));
+			sortedHand.add(leftOfPivot.get(elementCounter));
 		}
 		for(int elementCounter=0; elementCounter<rightOfPivot.size(); elementCounter++){ //Adds the cards back to the hands
-				sortedHand.add(rightOfPivot.get(elementCounter));
+			sortedHand.add(rightOfPivot.get(elementCounter));
 		}
 		return sortedHand;
-		
+
 	}
 	/**
 	 * Sorts everybody's hands
@@ -327,7 +339,7 @@ public class Round {
 			sortHand(player.hand);
 		}
 	}
-	
+
 	public ArrayList sortPivots(ArrayList<Card> hand){ //Bubble Sort
 		for(int elementCounter1=0; elementCounter1<hand.size(); elementCounter1++){
 			for(int elementCounter2=0; elementCounter2<hand.size()-1; elementCounter2++){
@@ -352,7 +364,9 @@ public class Round {
 		playedDeckPrint();
 		printHand(currentTurnNumber);
 		System.out.println(hand.size() + ". Skip Turn");
-		new MessageBox(findName(currentTurnNumber) + ", it is your turn. Please select " + numberOfCardsToPlay() + " to play. Close the box to see your hand.", false, main, 1);
+		if (currentPlayer.useGUI()) {
+			new MessageBox(findName(currentTurnNumber) + ", it is your turn. Please select " + numberOfCardsToPlay() + " to play. Close the box to see your hand.", false, main, 1);
+		}
 		main.drawHand(playerFind(currentTurnNumber));
 		do{
 			System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
@@ -376,7 +390,7 @@ public class Round {
 				ArrayList<Card> copyOfPlayedDeck = (ArrayList<Card>)playedDeck.clone(); // clone the played deck so the ai can't modify it
 				valueIn = ((ComputerPlayer)currentPlayer).playCard(copyOfPlayedDeck, numberOfCards);
 			}
-			
+
 			if(valueIn==hand.size()){
 				skipTurn=true;
 				mainLog.addLine(findName(currentTurnNumber) + ", has chosen to pass their turn. They did not play anything.");
@@ -390,7 +404,7 @@ public class Round {
 				System.out.println("You did not enter an acceptable value. please try again.\n");
 				cardBeingPlayed=new Card(0, 1);
 			}
-		}while(!skipTurn && (!acceptableValue || !isPlayableCard(cardBeingPlayed, currentTurnNumber, acceptableValue)));
+		}while(!skipTurn && (!acceptableValue || !isPlayableCard(cardBeingPlayed, currentTurnNumber, acceptableValue, player(currentTurnNumber))));
 		if(skipTurn){
 			System.out.println("\n" + findName(currentTurnNumber) + " has chosen to skip his or her turn.");
 		}else{
@@ -425,19 +439,19 @@ public class Round {
 		do{
 			currentTurnNumber=(currentTurnNumber+1)%4;
 		}while(turnNumberCompleted(currentTurnNumber));
-		
+
 	}
 	public void completedGame(){ //Is called when the round is completed; it announces the ranks
 		int highestUnfilledLocation=-1;
 		for(int elementCounter=0; elementCounter<finishedArray.length && highestUnfilledLocation==-1; elementCounter++){
 			if(finishedArray[elementCounter]==-1){
 				highestUnfilledLocation=elementCounter;
-				
+
 			}
 		}
 		finishedArray[highestUnfilledLocation]=currentTurnNumber;
 		main.disposeWindow();
-		
+
 	}
 	public int[] getFinishedArray(){ //Returns the finished array from the round(Is called in the etre class)
 		return finishedArray;
@@ -470,7 +484,7 @@ public class Round {
 			new MessageBox(messageList, false, main);
 			playersTradeCards(previousFinishedArray);
 
-;
+		
 		}
 
 	}
@@ -508,7 +522,7 @@ public class Round {
 			System.out.println(findName(lastCardPlayed.getTurnPlayedOn())+ "'s card has cleared the table. Because they completed the game, it will go to the player after them");
 			currentTurnNumber=lastCardPlayed.getTurnPlayedOn();
 		}
-		
+
 	}
 	public void playerCompletedRound(){ //Adds the player to the appropriate ran
 		if(playedDeck.size()>0 && playedDeck.get(playedDeck.size()-1).getValue()==2){
@@ -516,7 +530,7 @@ public class Round {
 			for(int elementCounter=finishedArray.length-1; elementCounter>=0 && lowestUnfilledLocation==-1; elementCounter--){
 				if(finishedArray[elementCounter]==-1){
 					lowestUnfilledLocation=elementCounter;
-					
+
 				}
 			}
 			finishedArray[lowestUnfilledLocation]=currentTurnNumber;
@@ -528,14 +542,14 @@ public class Round {
 			for(int elementCounter=0; elementCounter<finishedArray.length && highestUnfilledLocation==-1; elementCounter++){
 				if(finishedArray[elementCounter]==-1){
 					highestUnfilledLocation=elementCounter;
-					
+
 				}
 			}
 			finishedArray[highestUnfilledLocation]=currentTurnNumber;
 			//new MessageBox(findName(currentTurnNumber) + " has gotten rid of all of their cards. Congratulations!", false, main, 1);
 			mainLog.addLine(findName(currentTurnNumber) + " has gotten rid of all of their cards. Congratulations!");
 			eventLogHolder.updateSize();
-			
+
 		}
 		finalCardPlayedByPlayer=true;
 		lastCardPlayed.finalCardPlayed();
@@ -629,7 +643,7 @@ public class Round {
 		mainLog.addLine("The vice-president, " + findName(ranks[1]) + ", has traded two cards with his or her helper, " + findName(ranks[2]));
 		mainLog.addLine("The president, " + findName(ranks[0]) + ", goes first.");
 		eventLogHolder.updateSize();
-		
+
 		sortHands();
 	}
 	public void drawEveryValueOfCard(){

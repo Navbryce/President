@@ -23,7 +23,7 @@ public class PictureJLayeredPane extends JLayeredPane {
 	public void draw(String fileName, int xLocation, int yLocation, int layer){
 		String path = rootPath + fileName;
 		//String path="F:\\Computer Science 3-AP\\Unit2Part3\\Pictures\\" + fileName;
-		System.out.println(fileName);
+		// System.out.println(fileName);
 		ImageIcon picture=new ImageIcon(Toolkit.getDefaultToolkit().createImage(path));
 		JLabel pictureAdd=new ImageLabel(picture, fileName);
 		pictureAdd.setSize(new Dimension(picture.getIconWidth(), picture.getIconHeight()));

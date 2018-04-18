@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 
 import Cards.Card;
+import Players.Player;
 
 import java.util.ArrayList;
 
@@ -42,8 +43,13 @@ public class Window {
 	private ArrayList<JButton> buttonList = new ArrayList();
 	private AtomicInteger numberOfCardsAtomic;
 	private String rootPath;
-
-	Window(int size, String rootPathString) {
+	/**
+	 * 
+	 * @param size
+	 * @param rootPathString
+	 * @param existingPlayers - players that already have been defined ahead of time. most likely computer players.
+	 */
+	Window(int size, String rootPathString) {	
 		rootPath = rootPathString;
 		a = size;
 		if (size == 1) {
@@ -107,7 +113,7 @@ public class Window {
 		pictures.repaint();
 		pictures.setVisible(true);
 		windowBackground.add(pictures);
-		;
+		
 		windowBackground.pack();
 		windowBackground.repaint();
 		windowBackground.setVisible(true);
@@ -504,8 +510,11 @@ public class Window {
 		pictures.repaint();
 		windowBackground.repaint();
 	}
-
-	public ArrayList<String> getNames() {
+	/**
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> getNames(Player[] existingPlayers) {
 		ArrayList<String> resultList = new ArrayList();
 		enteredNames = new AtomicBoolean(false);
 		JPanel namesButton = new JPanel(new BorderLayout());
@@ -516,10 +525,17 @@ public class Window {
 		nameInput2 = new JTextField(10);
 		nameInput3 = new JTextField(10);
 		nameInput4 = new JTextField(10);
-		nameInput1.setText("Enter Player 1's name here...");
-		nameInput2.setText("Enter Player 2's name here...");
-		nameInput3.setText("Enter Player 3's name here...");
-		nameInput4.setText("Enter Player 4's name here...");
+		for (int playerCounter = 0; playerCounter <= 3; playerCounter++) { // Never more than three players in a game
+			Player player = existingPlayers[playerCounter];
+			JTextField relevantField = getNameInput(playerCounter);
+			if (player != null) {
+				relevantField.setText(player.getName());
+				relevantField.setEnabled(false);
+			} else {
+				relevantField.setText("Enter Player " + (playerCounter + 1) + "'s name here...");
+			}
+		}	
+
 		JButton enter = new JButton("Enter Names");
 		namesButton.add(enter, BorderLayout.PAGE_END);
 		FocusListener nameInput1Clear = new FocusListener() {
@@ -639,6 +655,24 @@ public class Window {
 		resultList.add(nameInput4.getText());
 		return resultList;
 
+	}
+	/**
+	 * 
+	 * @param counter - a number that represents a player/turn (0-3)
+	 * @return
+	 */
+	private JTextField getNameInput (int counter) {
+		JTextField field;
+		if (counter == 0) {
+			field = nameInput1;
+		} else if (counter == 1) {
+			field = nameInput2;
+		} else if (counter == 2) {
+			field = nameInput3;
+		} else {
+			field = nameInput4;
+		}
+		return field;
 	}
 
 	public void addStaticObject(JComponent object) {

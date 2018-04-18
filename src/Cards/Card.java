@@ -80,7 +80,7 @@ public class Card {
 		}else{
 			fileName="cards\\" + getValue() + fileName.substring(spaceOne) + ".png";
 		}
-		System.out.println(fileName);
+		// System.out.println(fileName);
 
 		return fileName;
 		

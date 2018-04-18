@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Cards.Card;
+import Cards.RoundStart;
 
 public abstract class ComputerPlayer extends Player {
 	private HashMap <Integer, ArrayList<Card>> cardMap = new HashMap();
@@ -20,7 +21,25 @@ public abstract class ComputerPlayer extends Player {
 	 * @param numberOfCards - the number of cards that needs to be played
 	 * @return - the/a index of te card being played
 	 */
-	public abstract int playCard (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards);
+	public int playCard (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards) {
+		return playCardProtected(cardsAlreadyPlayed, numberOfCards, getProtectedHand());
+	}
+	/**
+	 * same as above, but the hand parameter is protected meaning it is a clone of the actual hand
+	 * @param cardsAlreadyPlayed
+	 * @param numberOfCards
+	 * @param protectedHand
+	 * @return
+	 */
+	protected abstract int playCardProtected (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards, ArrayList<Card> protectedHand);
+	/**
+	 * 
+	 * @return the number of cards and the index of the card in hand that the AI wants to use to start the round
+	 */
+	public RoundStart startRound () {
+		return startRoundProtected(getProtectedHand());
+	}
+	protected abstract RoundStart startRoundProtected (ArrayList<Card> protectedHand);
 	
 	/**
 	 * 
