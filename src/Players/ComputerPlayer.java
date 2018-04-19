@@ -11,10 +11,17 @@ public abstract class ComputerPlayer extends Player {
 	public ComputerPlayer(String nameValue, ArrayList<Card> hand) {
 		super(nameValue, hand);
 	}
-
-	public boolean useGUI () {
-		return false;
+	
+	/**
+	 * 
+	 * @return the card from the player's hand to trade. giveCardProtected is sent a copy of the player's hand
+	 */
+	public int giveCard () {
+		return giveCardProtected(getProtectedHand());
 	}
+	
+	protected abstract int giveCardProtected(ArrayList<Card> hand);
+
 	/**
 	 * 
 	 * @param cardsAlreadyPlayed - the cards already played
@@ -32,6 +39,7 @@ public abstract class ComputerPlayer extends Player {
 	 * @return
 	 */
 	protected abstract int playCardProtected (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards, ArrayList<Card> protectedHand);
+	
 	/**
 	 * 
 	 * @return the number of cards and the index of the card in hand that the AI wants to use to start the round
@@ -42,12 +50,22 @@ public abstract class ComputerPlayer extends Player {
 	protected abstract RoundStart startRoundProtected (ArrayList<Card> protectedHand);
 	
 	/**
+	 * return index in "everyValueHand" of card. Index must be between 0 and 13
+	 */
+	public abstract int requestCard(ArrayList<Card> cardsAlreadyRequested);
+	
+	public boolean useGUI () {
+		return false;
+	}
+	
+	/**
 	 * 
 	 * @return a protected version of the hand that can be modified
 	 */
 	private ArrayList<Card> getProtectedHand () {
 		return (ArrayList<Card>)this.hand.clone();
 	}
+	
 	/**
 	 * 
 	 * @param cardsInput - the cards to make the map from

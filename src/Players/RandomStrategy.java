@@ -34,5 +34,17 @@ public class RandomStrategy extends ComputerPlayer{
 		return (int)(Math.random() * hand.size());
 	}
 
+	@Override
+	public int requestCard (ArrayList<Card> cardsAlreadyRequested) {
+		// TODO Auto-generated method stub
+		return (int)(Math.random() * 13);
+	}
+
+	@Override
+	protected int giveCardProtected(ArrayList<Card> hand) {
+		// TODO Auto-generated method stub
+		return getRandomCard(hand);
+	}
+
 
 }

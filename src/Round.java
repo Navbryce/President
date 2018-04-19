@@ -180,6 +180,20 @@ public class Round {
 	public String findName(int turnNumber){
 		return(player(turnNumber).getName());
 	}
+	/**
+	 * 
+	 * @return will return true if one player needs GUI
+	 */
+	public boolean playerNeedsGUI () {
+		boolean GUI = false;
+		for (Player player: players) {
+			GUI = player.useGUI();
+			if (GUI) {
+				break;
+			}
+		}
+		return GUI;
+	}
 	public void printHand(int turnNumber){
 		/*System.out.println("Your(" + findName(turnNumber)+"'s) hand is: ");
 		ArrayList <Card> hand=playerFind(turnNumber);
@@ -466,13 +480,7 @@ public class Round {
 		return completed;
 	}
 	public void printPreviousFinished(){ //Prints the ranks at the start of the round
-		if(previousFinishedArray[0]!=0){
-			System.out.println("\nThe ranks at the start of this round are:");
-			System.out.println("President: " + findName(previousFinishedArray[0]));
-			System.out.println("Vice-President: " + findName(previousFinishedArray[1]));
-			System.out.println("Vice-President's Helper: " + findName(previousFinishedArray[2]));
-			System.out.println("President's Helper: " + findName(previousFinishedArray[3]));
-			System.out.println("\nThe President Goes First: ");
+		if(previousFinishedArray[0] != -1){
 			currentTurnNumber=previousFinishedArray[0];
 			ArrayList<String> messageList = new ArrayList();
 			messageList.add("\nThe ranks at the start of this round are:");
@@ -481,7 +489,13 @@ public class Round {
 			messageList.add("Vice-President's Helper: " + findName(previousFinishedArray[2]));
 			messageList.add("President's Helper: " + findName(previousFinishedArray[3]));
 			messageList.add("\nTrading will now begin; the President will trade first. ");
-			new MessageBox(messageList, false, main);
+			
+			for (String message: messageList) {
+				System.out.println(message);
+			}
+			if (playerNeedsGUI()) {
+				new MessageBox(messageList, false, main);
+			}
 			playersTradeCards(previousFinishedArray);
 
 		
@@ -566,11 +580,12 @@ public class Round {
 			}
 		}
 
-		if(!hasCardInHand){
+		if(!hasCardInHand && message){
 			new MessageBox(findName(turnNumber) + " does not have a " + cardRequested.getNameWithoutSuit() + " in his hand. Please try again. (Note suit does not matter)", false, main, 1);
 		}
 		return hasCardInHand;
 	}
+	
 	public int getIndexOfCard(Card cardRequested, int turnNumber){
 		ArrayList<Card> hand = playerFind(turnNumber);
 		int cardIndex=-1;
@@ -586,49 +601,72 @@ public class Round {
 	public void tradeCards(int turnNumber1, int turnNumber2, int numberOfCardsBeingTraded){
 		Card selectedCard;
 		int cardsTraded=0;
+		Player player1 = player(turnNumber1);
 		drawEveryValueOfCard();
 		main.drawTurnNumber(turnNumber1, findName(turnNumber1));
 		do{
 			drawEveryValueOfCard();
 			main.drawTurnNumber(turnNumber1, findName(turnNumber1));
-			if(cardsTraded>0){
-				new MessageBox("Now " + findName(turnNumber1) + " select ANOTHER card you want from " + findName(turnNumber2) + ".", false, main, 1);
-			}else{
-				new MessageBox(findName(turnNumber1) + ", select the card you want from " + findName(turnNumber2) + ". Note, he or she might not have this card in their hand.", false, main, 2);	
+			if (player1.useGUI()) {
+				if(cardsTraded>0){
+					new MessageBox("Now " + findName(turnNumber1) + " select ANOTHER card you want from " + findName(turnNumber2) + ".", false, main, 1);
+				}else{
+					new MessageBox(findName(turnNumber1) + ", select the card you want from " + findName(turnNumber2) + ". Note, he or she might not have this card in their hand.", false, main, 2);	
+				}
 			}
 			Card cardSelected1;
 			ArrayList<Card> handOfTrader;
 			ArrayList<Card> handOfReceiver;
 			handOfTrader=playerFind(turnNumber1);
 			handOfReceiver=playerFind(turnNumber2);
-			int valueIn;
+			int valueIn = -1;
 			int indexOfCardWanted;
 			int indexOfBeingGiven;
-			do{
-				main.setMessageBox(false);
-				valueIn=main.mouseClick();
-				if(reselectMB.get()){
+			ArrayList<Card> cardsAlreadyRequested = new ArrayList();
+			do{	
+				if (valueIn != -1) {
+					cardsAlreadyRequested.add(everyValueHand.get(valueIn));
+				}
+				
+				if (player1.useGUI()) {
+					main.setMessageBox(false);
+					valueIn=main.mouseClick();
+				} else {
+					valueIn = ((ComputerPlayer)player1).requestCard(cardsAlreadyRequested);
+				}
+				if(reselectMB.get() && player1.useGUI()){
 					new MessageBox("You selected a(n): " + everyValueHand.get(valueIn).getNameWithoutSuit(), true, main, 0);
 				}else{
 					main.setMessageBox(true);
 				}
-			}while(!main.getMessageBox() || !hasCardInHand(everyValueHand.get(valueIn), turnNumber2, true));
+			}while(!main.getMessageBox() || !hasCardInHand(everyValueHand.get(valueIn), turnNumber2, player1.useGUI()));
 			cardSelected1=everyValueHand.get(valueIn);
 			indexOfCardWanted=getIndexOfCard(cardSelected1, turnNumber2);
 			main.clearWindow();
 			main.drawTurnNumber(turnNumber1, findName(turnNumber1));
-			new MessageBox(findName(turnNumber1) + ", now select the card you want to give to " + findName(turnNumber2) + " in exchange for the " + cardSelected1.getNameWithoutSuit() + " that you took.", false, main, 1);
+			if (player1.useGUI()) {
+				new MessageBox(findName(turnNumber1) + ", now select the card you want to give to " + findName(turnNumber2) + " in exchange for the " + cardSelected1.getNameWithoutSuit() + " that you took.", false, main, 1);
+			}
 			main.drawHand(playerFind(turnNumber1));
-			do{
-				main.setMessageBox(false);
-				valueIn=main.mouseClick();
-				if(reselectMB.get()){
-					new MessageBox("You selected a(n): " + handOfTrader.get(valueIn).getNameWithoutSuit(), true, main, 0);
-				}else{
-					main.setMessageBox(true);
-				}
-			}while(!main.getMessageBox()); 
-			new MessageBox(findName(turnNumber1) + " took " + findName(turnNumber2) + "'s " + cardSelected1.getNameWithoutSuit() + ", in exchange for a(n) " + handOfTrader.get(valueIn).getNameWithoutSuit(), false, main, 1);
+			if (player1.useGUI()) {
+				do{
+					main.setMessageBox(false);
+					valueIn=main.mouseClick();
+					if(reselectMB.get()){
+						new MessageBox("You selected a(n): " + handOfTrader.get(valueIn).getNameWithoutSuit(), true, main, 0);
+					}else{
+						main.setMessageBox(true);
+					}
+				}while(!main.getMessageBox());
+			} else {
+				valueIn = ((ComputerPlayer)player1).giveCard(); // Does not need to be checked because the player knows the cards in his/her hands
+			}
+			String message = findName(turnNumber1) + " took " + findName(turnNumber2) + "'s " + cardSelected1.getNameWithoutSuit() + ", in exchange for a(n) " + handOfTrader.get(valueIn).getNameWithoutSuit();
+			if (player1.useGUI()) {	
+				new MessageBox(message, false, main, 1);
+			} else {
+				System.out.println(message);
+			}
 			handOfTrader.add(handOfReceiver.remove(indexOfCardWanted));
 			handOfReceiver.add(handOfTrader.remove(valueIn));
 			cardsTraded++;
@@ -648,10 +686,7 @@ public class Round {
 	}
 	public void drawEveryValueOfCard(){
 		main.clearWindow();
-		everyValueHand = new ArrayList();
-		for(int elementCounter=2; elementCounter<=14; elementCounter++){
-			everyValueHand.add(new Card(elementCounter, 2));
-		}
+		everyValueHand = Card.getEveryValueHand();
 		main.drawHand(everyValueHand);
 
 	}

@@ -1,4 +1,7 @@
 package Cards;
+
+import java.util.ArrayList;
+
 public class Card {
 	final int hearts=1;
 	final int spades=2;
@@ -15,6 +18,18 @@ public class Card {
 	private int yLocation=0;
 	private boolean isFinalCardPlayed=false;
 	
+	/**
+	 * 
+	 * @return a hand with every value of card
+	 */
+	public static ArrayList getEveryValueHand () {
+		ArrayList<Card> hand = new ArrayList();
+		for(int elementCounter=2; elementCounter<=14; elementCounter++){
+			hand.add(new Card(elementCounter, 2));
+		}
+		return hand;
+		
+	}
 	
 	public Card(int cardValue, int suitValue){
 		value=cardValue;
