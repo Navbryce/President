@@ -49,7 +49,6 @@ public class Round {
 			if(playedDeck.size()==0){
 				main.clearPlayedDeck();
 				main.drawTurnNumber(currentTurnNumber, findName(currentTurnNumber));
-				main.drawHand(playerFind(currentTurnNumber));
 				roundStart();
 			}else if((lastCardPlayed.getValue()==2 || completeSet(true) || currentTurnNumber==(lastCardPlayed.getTurnPlayedOn())) && !finalCardPlayedByPlayer){
 				main.clearWindow();
@@ -61,7 +60,7 @@ public class Round {
 				main.clearWindow();
 				main.drawPlayedDeck(playedDeck);
 				main.drawTurnNumber(currentTurnNumber, findName(currentTurnNumber));
-				System.out.println(currentTurnNumber);
+				// System.out.println(currentTurnNumber);
 				playerCardSelect();
 			}
 			if(finalCardPlayedByPlayer){
@@ -212,6 +211,9 @@ public class Round {
 		printHand(currentTurnNumber);
 		hand=playerFind(currentTurnNumber);
 		lastCardPlayed=new Card(1, 1);
+		if (playerNeedsGUI()) { // Draw everybody's hands EVEN if that player is computer if there is at LEAST one human player
+			main.drawHand(playerFind(currentTurnNumber));
+		}
 		if (player.useGUI()) {
 			new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
 		}
@@ -381,7 +383,9 @@ public class Round {
 		if (currentPlayer.useGUI()) {
 			new MessageBox(findName(currentTurnNumber) + ", it is your turn. Please select " + numberOfCardsToPlay() + " to play. Close the box to see your hand.", false, main, 1);
 		}
-		main.drawHand(playerFind(currentTurnNumber));
+		if (playerNeedsGUI()) { // If at least one player needs a GUI, draw all players' hands (even if they're a computer)
+			main.drawHand(playerFind(currentTurnNumber));
+		}
 		do{
 			System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
 			if (currentPlayer.useGUI()) { // a human player needs to use the GUI

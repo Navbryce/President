@@ -16,7 +16,7 @@ public class RandomStrategy extends ComputerPlayer{
 	protected int playCardProtected(ArrayList<Card> cardsAlreadyPlayed, int numberOfCards,
 			ArrayList<Card> protectedHand) {
 		int cardIndex = getRandomCard(protectedHand);
-		System.out.println("Random:" + cardIndex);
+		// System.out.println("Random:" + cardIndex);
 		return cardIndex;
 	}
 

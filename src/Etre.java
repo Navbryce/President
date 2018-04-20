@@ -24,6 +24,13 @@ public class Etre {
 		players[1] = new RandomStrategy("Random Strategy1", null);
 		players[2] = new RandomStrategy("Random Strategy2", null);
 		players[3] = new RandomStrategy("Random Strategy3", null);
+	
+		/*
+		players[0] = new HumanPlayer("Bryce", null);
+		players[1] = new HumanPlayer("Bob", null);
+		players[2] = new HumanPlayer("Joe", null);
+		*/
+		// players[3] = new HumanPlayer("Anne", null);
 
 		
 		Round currentRound;
@@ -87,8 +94,8 @@ public class Etre {
 	}
 	
 	private String getScoreString (int playerNumber) {
-		int score = getScore(playerNumber);
-		int average = score / numberOfGamesPlayed;
+		double score = getScore(playerNumber);
+		double average = score / (double) numberOfGamesPlayed;
 		return ". The player's overall score is " + score +". His/her average position is " + average + ".";
 	}
 	/**

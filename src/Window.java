@@ -200,7 +200,7 @@ public class Window {
 		doubleCard.removeAll();
 		tripleCard.removeAll();
 		quadrupleCard.removeAll();
-		System.out.println(numberOfCards);
+		// System.out.println(numberOfCards);
 		return numberOfCards;
 	}
 
