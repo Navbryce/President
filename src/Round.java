@@ -606,7 +606,6 @@ public class Round {
 		Card selectedCard;
 		int cardsTraded=0;
 		Player player1 = player(turnNumber1);
-		drawEveryValueOfCard();
 		main.drawTurnNumber(turnNumber1, findName(turnNumber1));
 		do{
 			drawEveryValueOfCard();
@@ -651,8 +650,8 @@ public class Round {
 			if (player1.useGUI()) {
 				new MessageBox(findName(turnNumber1) + ", now select the card you want to give to " + findName(turnNumber2) + " in exchange for the " + cardSelected1.getNameWithoutSuit() + " that you took.", false, main, 1);
 			}
-			main.drawHand(playerFind(turnNumber1));
 			if (player1.useGUI()) {
+				main.drawHand(playerFind(turnNumber1));
 				do{
 					main.setMessageBox(false);
 					valueIn=main.mouseClick();
@@ -691,7 +690,9 @@ public class Round {
 	public void drawEveryValueOfCard(){
 		main.clearWindow();
 		everyValueHand = Card.getEveryValueHand();
-		main.drawHand(everyValueHand);
+		if (playerNeedsGUI()) {
+			main.drawHand(everyValueHand);
+		}
 
 	}
 	public int numberOfCardsOfValue(int value, ArrayList<Card> hand){

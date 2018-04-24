@@ -320,6 +320,7 @@ public class Window {
 	}
 
 	public void drawTurnNumber(int turnNumber, String name) {
+		
 		JLabel playerName = new JLabel(name);
 		playerName.setFont(new Font(playerName.getFont().getName(), Font.PLAIN, 45));
 		playerName.setBounds(0, 25, (int) playerName.getPreferredSize().getWidth(), 63);

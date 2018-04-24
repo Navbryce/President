@@ -13,8 +13,9 @@ public class Etre {
 	private int[] finishedArray={-1,0,0,0};
 	private Player[] players = new Player[4];
 	private int[] scores = {0, 0, 0, 0};
-	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\";
+	private String rootPath = "C:\\Users\\navba\\git\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
+	private int numberOfGamesToPlay = 10;
 	public static void main(String args[]){
 		new Etre();
 	}
@@ -41,12 +42,17 @@ public class Etre {
 		nameInput.disposeWindow();
 		do{
 			numberOfGamesPlayed++;
+			numberOfGamesToPlay--;
 			currentRound=new Round(finishedArray, players, rootPath);
 			finishedArray=currentRound.getFinishedArray();
 			processScores(finishedArray); // Update scores
-			continueWindow = new Window(3, rootPath);
-			completedGame=continueWindow.continueScreen(getNamesRanksList());
-			continueWindow.disposeWindow();
+			if (numberOfGamesToPlay <= 0) {
+				continueWindow = new Window(3, rootPath);
+				completedGame=continueWindow.continueScreen(getNamesRanksList());
+				continueWindow.disposeWindow();
+			} else {
+				completedGame = true;
+			}
 		}while(completedGame);
 		
 	}
