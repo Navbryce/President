@@ -19,7 +19,7 @@ public class Window {
 	private int a;
 	private int handSize;
 	private ArrayList<Card> playedDeckDraw1 = new ArrayList();;
-	private JFrame windowBackground = new JFrame("Etre");
+	private JFrame windowBackground;
 	private JLayeredPane pictures = new JLayeredPane();
 	private ArrayList<JLabel> componentList = new ArrayList();
 	private ArrayList<JLabel> playedDeckPictures = new ArrayList();
@@ -43,80 +43,96 @@ public class Window {
 	private ArrayList<JButton> buttonList = new ArrayList();
 	private AtomicInteger numberOfCardsAtomic;
 	private String rootPath;
+	private boolean humanPlayers;
+	private boolean continueScreen;
 	/**
 	 * 
 	 * @param size
 	 * @param rootPathString
-	 * @param existingPlayers - players that already have been defined ahead of time. most likely computer players.
+	 * @param humanplayersValue - true if the game has human players
 	 */
-	Window(int size, String rootPathString) {	
+	Window(int size, String rootPathString, boolean humanPlayersValue) {	
 		rootPath = rootPathString;
 		a = size;
-		if (size == 1) {
-			windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			windowBackground.setPreferredSize(new Dimension(1440, 720));
-			pictures.setPreferredSize(new Dimension(1440, 720));
-			draw("backgroundPres.jpg", 0, 0, 0, true);
-		} else {
-			windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			windowBackground.setPreferredSize(new Dimension(1200, 720));
-			pictures.setPreferredSize(new Dimension(1200, 720));
-			if (size == 0) {
-				draw("backgroundPres1.jpg", 0, 0, 0, true);
-			} else if (size == 3) {
-				draw("completedReal.png", 0, 0, 0, true);
-			} else if (size == 4) {
-				draw("president.jpg", 0, 0, 0, true);
+		humanPlayers = humanPlayersValue;
+		continueScreen = size == 3 || size == 4;
+		if (humanPlayers || continueScreen) {
+			windowBackground = new JFrame("Etre");
+
+			if (size == 1) {
+				windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				windowBackground.setPreferredSize(new Dimension(1440, 720));
+				pictures.setPreferredSize(new Dimension(1440, 720));
+				draw("backgroundPres.jpg", 0, 0, 0, true);
+			} else {
+				windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				windowBackground.setPreferredSize(new Dimension(1200, 720));
+				pictures.setPreferredSize(new Dimension(1200, 720));
+				if (size == 0) {
+					draw("backgroundPres1.jpg", 0, 0, 0, true);
+				} else if (size == 3) {
+					draw("completedReal.png", 0, 0, 0, true);
+				} else if (size == 4) {
+					draw("president.jpg", 0, 0, 0, true);
+				}
 			}
 		}
 	}
 
-	Window(int size, Round roundSent, String rootPathString) {
+	Window(int size, Round roundSent, String rootPathString, boolean humanPlayersValue) {
 		rootPath = rootPathString;
 		a = size;
-		if (size == 1) {
-			windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			windowBackground.setPreferredSize(new Dimension(1440, 720));
-			pictures.setPreferredSize(new Dimension(1440, 720));
-			draw("backgroundPres.jpg", 0, 0, 0, true);
-		} else {
-			windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			windowBackground.setPreferredSize(new Dimension(1200, 720));
-			pictures.setPreferredSize(new Dimension(1200, 720));
-			if (size == 0) {
-				draw("backgroundPres1.jpg", 0, 0, 0, true);
-			} else if (size == 3) {
-				draw("completed.png", 0, 0, 0, true);
-			} else if (size == 4) {
-				draw("president.jpg", 0, 0, 0, true);
+		humanPlayers = humanPlayersValue;
+		continueScreen = size == 3 || size == 4;
+		if (humanPlayers || continueScreen) {
+			windowBackground = new JFrame("Etre");
+
+			if (size == 1) {
+				windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				windowBackground.setPreferredSize(new Dimension(1440, 720));
+				pictures.setPreferredSize(new Dimension(1440, 720));
+				draw("backgroundPres.jpg", 0, 0, 0, true);
+			} else {
+				windowBackground.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				windowBackground.setPreferredSize(new Dimension(1200, 720));
+				pictures.setPreferredSize(new Dimension(1200, 720));
+				if (size == 0) {
+					draw("backgroundPres1.jpg", 0, 0, 0, true);
+				} else if (size == 3) {
+					draw("completed.png", 0, 0, 0, true);
+				} else if (size == 4) {
+					draw("president.jpg", 0, 0, 0, true);
+				}
 			}
+			roundBeingPlayed = roundSent;
 		}
-		roundBeingPlayed = roundSent;
 
 	}
 
 	public void draw(String fileName, int xLocation, int yLocation, int layer, boolean inHand) {
-		String path = rootPath + fileName;
-		// String path="F:\\Computer Science 3-AP\\Unit2Part3\\Pictures\\" +
-		// fileName;
-		ImageIcon picture = new ImageIcon(Toolkit.getDefaultToolkit().createImage(path));
-		JLabel pictureAdd = new ImageLabel(picture, fileName);
-		pictureAdd.setSize(new Dimension(picture.getIconWidth(), picture.getIconHeight()));
-		pictures.add(pictureAdd, new Integer(layer));
-		pictureAdd.setLocation(xLocation, yLocation);
-		if (inHand) {
-			componentList.add(pictureAdd);
-		} else {
-			playedDeckPictures.add(pictureAdd);
+		if (humanPlayers || continueScreen) {
+			String path = rootPath + fileName;
+			// String path="F:\\Computer Science 3-AP\\Unit2Part3\\Pictures\\" +
+			// fileName;
+			ImageIcon picture = new ImageIcon(Toolkit.getDefaultToolkit().createImage(path));
+			JLabel pictureAdd = new ImageLabel(picture, fileName);
+			pictureAdd.setSize(new Dimension(picture.getIconWidth(), picture.getIconHeight()));
+			pictures.add(pictureAdd, new Integer(layer));
+			pictureAdd.setLocation(xLocation, yLocation);
+			if (inHand) {
+				componentList.add(pictureAdd);
+			} else {
+				playedDeckPictures.add(pictureAdd);
+			}
+	
+			pictures.repaint();
+			pictures.setVisible(true);
+			windowBackground.add(pictures);
+			
+			windowBackground.pack();
+			windowBackground.repaint();
+			windowBackground.setVisible(true);
 		}
-
-		pictures.repaint();
-		pictures.setVisible(true);
-		windowBackground.add(pictures);
-		
-		windowBackground.pack();
-		windowBackground.repaint();
-		windowBackground.setVisible(true);
 	}
 
 	public int numberOfCardsButtons(boolean additionalButton) {
@@ -209,22 +225,24 @@ public class Window {
 	}
 
 	public void clearWindow() {
-		for (int elementCounter = 1; elementCounter < componentList.size(); elementCounter++) {
-			pictures.remove(pictures.getIndexOf(componentList.remove(elementCounter)));
-			elementCounter -= 1;
-
+		if (humanPlayers || continueScreen) {
+			for (int elementCounter = 1; elementCounter < componentList.size(); elementCounter++) {
+				pictures.remove(pictures.getIndexOf(componentList.remove(elementCounter)));
+				elementCounter -= 1;
+	
+			}
+			for (int elementCounter = 0; elementCounter < playedDeckPictures.size(); elementCounter++) {
+				pictures.remove(pictures.getIndexOf(playedDeckPictures.remove(elementCounter)));
+				elementCounter -= 1;
+			}
+			for (int elementCounter = 0; elementCounter < otherButtons.size(); elementCounter++) {
+				pictures.remove(pictures.getIndexOf(otherButtons.remove(elementCounter)));
+			}
+			pictures.repaint();
+			pictures.setVisible(true);
+			windowBackground.repaint();
+			windowBackground.setVisible(true);
 		}
-		for (int elementCounter = 0; elementCounter < playedDeckPictures.size(); elementCounter++) {
-			pictures.remove(pictures.getIndexOf(playedDeckPictures.remove(elementCounter)));
-			elementCounter -= 1;
-		}
-		for (int elementCounter = 0; elementCounter < otherButtons.size(); elementCounter++) {
-			pictures.remove(pictures.getIndexOf(otherButtons.remove(elementCounter)));
-		}
-		pictures.repaint();
-		pictures.setVisible(true);
-		windowBackground.repaint();
-		windowBackground.setVisible(true);
 	}
 
 	public void removeButtons() {
@@ -286,32 +304,34 @@ public class Window {
 	}
 
 	public void drawPlayedDeck(ArrayList<Card> playedDeck) {
-		ArrayList<Card> playedDeckDraw = new ArrayList();
-		for (int elementCounter = 0; elementCounter < playedDeck.size(); elementCounter++) {
-			playedDeckDraw.add(playedDeck.get(elementCounter));
-			playedDeckDraw1.add(playedDeck.get(elementCounter));
-		}
-
-		int x;
-		int layer = 3;
-		if (a == 1) {
-			x = 620;
-		} else {
-			x = 500;
-		}
-		int y = 200;
-		while (playedDeckDraw.size() > 4) {
-			draw(playedDeckDraw.remove(0).getFileName(), x, y, layer, false);
-			x += 2;
-			layer++;
-		}
-
-		for (int elementCounter = 0; elementCounter < playedDeckDraw.size(); elementCounter++) {
-			draw(playedDeckDraw.remove(elementCounter).getFileName(), x, y, layer, false);
-			layer++;
-			elementCounter -= 1;
-			x += 20;
-			y += 40;
+		if (humanPlayers || continueScreen) {
+			ArrayList<Card> playedDeckDraw = new ArrayList();
+			for (int elementCounter = 0; elementCounter < playedDeck.size(); elementCounter++) {
+				playedDeckDraw.add(playedDeck.get(elementCounter));
+				playedDeckDraw1.add(playedDeck.get(elementCounter));
+			}
+	
+			int x;
+			int layer = 3;
+			if (a == 1) {
+				x = 620;
+			} else {
+				x = 500;
+			}
+			int y = 200;
+			while (playedDeckDraw.size() > 4) {
+				draw(playedDeckDraw.remove(0).getFileName(), x, y, layer, false);
+				x += 2;
+				layer++;
+			}
+	
+			for (int elementCounter = 0; elementCounter < playedDeckDraw.size(); elementCounter++) {
+				draw(playedDeckDraw.remove(elementCounter).getFileName(), x, y, layer, false);
+				layer++;
+				elementCounter -= 1;
+				x += 20;
+				y += 40;
+			}
 		}
 	}
 
@@ -320,52 +340,54 @@ public class Window {
 	}
 
 	public void drawTurnNumber(int turnNumber, String name) {
-		
-		JLabel playerName = new JLabel(name);
-		playerName.setFont(new Font(playerName.getFont().getName(), Font.PLAIN, 45));
-		playerName.setBounds(0, 25, (int) playerName.getPreferredSize().getWidth(), 63);
-		playerName.setOpaque(true);
-		playerName.setForeground(Color.BLACK);
-		playerName.setBackground(Color.WHITE);
-		pictures.add(playerName, new Integer(3));
-		playerName.setVisible(true);
-		playedDeckPictures.add(playerName);
-		windowBackground.add(pictures);
-		pictures.setVisible(true);
-		windowBackground.setVisible(true);
-		pictures.repaint();
-		windowBackground.repaint();
-
+		if (humanPlayers || continueScreen) {
+			JLabel playerName = new JLabel(name);
+			playerName.setFont(new Font(playerName.getFont().getName(), Font.PLAIN, 45));
+			playerName.setBounds(0, 25, (int) playerName.getPreferredSize().getWidth(), 63);
+			playerName.setOpaque(true);
+			playerName.setForeground(Color.BLACK);
+			playerName.setBackground(Color.WHITE);
+			pictures.add(playerName, new Integer(3));
+			playerName.setVisible(true);
+			playedDeckPictures.add(playerName);
+			windowBackground.add(pictures);
+			pictures.setVisible(true);
+			windowBackground.setVisible(true);
+			pictures.repaint();
+			windowBackground.repaint();
+		}
 	}
 
 	public void drawHand(ArrayList<Card> hand) {
-		int start = 135;
-		int x = 0;
-		int multiplier = 90;
-		handSize = hand.size();
-		if (getSize() != 1) {
-			start = 30;
-			multiplier = 80;
-		}
-		int y = 500;
-		Card cardInHand;
-		for (int elementCounter = 0; elementCounter < hand.size(); elementCounter++) {
-			x = start + elementCounter * multiplier;
-			cardInHand = hand.get(elementCounter);
-			draw(cardInHand.getFileName(), x, y, 1, true);
-		}
-		x += multiplier;
-		if (playedDeckDraw1.size() > 0) {
-			skipTurn = new JButton("Skip");
-			otherButtons.add(skipTurn);
-			skipTurn.setBackground(Color.white);
-			skipTurn.setBounds(x, y, 75, 108);
-			pictures.add(skipTurn, new Integer(3));
-			windowBackground.add(pictures);
-			pictures.repaint();
-			windowBackground.repaint();
-			skipTurn.setVisible(true);
-			skipTurn.setVisible(true);
+		if (humanPlayers || continueScreen) {
+			int start = 135;
+			int x = 0;
+			int multiplier = 90;
+			handSize = hand.size();
+			if (getSize() != 1) {
+				start = 30;
+				multiplier = 80;
+			}
+			int y = 500;
+			Card cardInHand;
+			for (int elementCounter = 0; elementCounter < hand.size(); elementCounter++) {
+				x = start + elementCounter * multiplier;
+				cardInHand = hand.get(elementCounter);
+				draw(cardInHand.getFileName(), x, y, 1, true);
+			}
+			x += multiplier;
+			if (playedDeckDraw1.size() > 0) {
+				skipTurn = new JButton("Skip");
+				otherButtons.add(skipTurn);
+				skipTurn.setBackground(Color.white);
+				skipTurn.setBounds(x, y, 75, 108);
+				pictures.add(skipTurn, new Integer(3));
+				windowBackground.add(pictures);
+				pictures.repaint();
+				windowBackground.repaint();
+				skipTurn.setVisible(true);
+				skipTurn.setVisible(true);
+			}
 		}
 
 	}
@@ -375,18 +397,22 @@ public class Window {
 	}
 
 	public void clearCardsPlayed() {
-		for (int elementCounter = 0; elementCounter < playedDeckPictures.size(); elementCounter++) {
-			pictures.remove(pictures.getIndexOf(playedDeckPictures.remove(elementCounter)));
-			elementCounter -= 1;
-			windowBackground.add(pictures);
-			pictures.setVisible(true);
-			pictures.repaint();
-			windowBackground.repaint();
+		if (humanPlayers || continueScreen) {
+			for (int elementCounter = 0; elementCounter < playedDeckPictures.size(); elementCounter++) {
+				pictures.remove(pictures.getIndexOf(playedDeckPictures.remove(elementCounter)));
+				elementCounter -= 1;
+				windowBackground.add(pictures);
+				pictures.setVisible(true);
+				pictures.repaint();
+				windowBackground.repaint();
+			}
 		}
 	}
 
 	public void disposeWindow() {
-		windowBackground.dispose();
+		if (humanPlayers || continueScreen) {
+			windowBackground.dispose();
+		}
 	}
 
 	public boolean continueScreen(ArrayList<String> nameRankList) {
@@ -443,73 +469,75 @@ public class Window {
 	}
 
 	public void addMenu() {
-		JMenuBar menuList = new JMenuBar();
-		String result = "";
-		AbstractAction menuAction = new AbstractAction() {
-			public void actionPerformed(ActionEvent ae) {
-				String selectedItem;
-				JComboBox menu = (JComboBox) ae.getSource();
-				selectedItem = (String) menu.getSelectedItem();
-				selectedItem += ".jpg";
-				if (selectedItem.equals("Default.jpg")) {
-					selectedItem = "backgroundPres1.jpg";
-				} else if (selectedItem.equals("Cats.jpg")) {
-					selectedItem = "Cats.gif";
-				} else if (selectedItem.equals("Snow.jpg")) {
-					selectedItem = "Snow.gif";
-				} else if (selectedItem.equals("Rain.jpg")) {
-					selectedItem = "Rain.gif";
+		if (humanPlayers || continueScreen) {
+			JMenuBar menuList = new JMenuBar();
+			String result = "";
+			AbstractAction menuAction = new AbstractAction() {
+				public void actionPerformed(ActionEvent ae) {
+					String selectedItem;
+					JComboBox menu = (JComboBox) ae.getSource();
+					selectedItem = (String) menu.getSelectedItem();
+					selectedItem += ".jpg";
+					if (selectedItem.equals("Default.jpg")) {
+						selectedItem = "backgroundPres1.jpg";
+					} else if (selectedItem.equals("Cats.jpg")) {
+						selectedItem = "Cats.gif";
+					} else if (selectedItem.equals("Snow.jpg")) {
+						selectedItem = "Snow.gif";
+					} else if (selectedItem.equals("Rain.jpg")) {
+						selectedItem = "Rain.gif";
+					}
+					pictures.remove(pictures.getIndexOf(componentList.get(0)));
+					componentList.remove(0);
+					pictures.repaint();
+					main.draw(selectedItem, 0, 0, new Integer(0), true);
+					componentList.add(0, componentList.remove(componentList.size() - 1));
 				}
-				pictures.remove(pictures.getIndexOf(componentList.get(0)));
-				componentList.remove(0);
-				pictures.repaint();
-				main.draw(selectedItem, 0, 0, new Integer(0), true);
-				componentList.add(0, componentList.remove(componentList.size() - 1));
-			}
-		};
-		AbstractAction reselectAbility = new AbstractAction() {
-			public void actionPerformed(ActionEvent ae) {
-				boolean reselectOption;
-				JComboBox menu = (JComboBox) ae.getSource();
-				String selectedItem = (String) menu.getSelectedItem();
-				if (selectedItem.equals("On")) {
-					reselectOption = true;
-				} else {
-					reselectOption = false;
+			};
+			AbstractAction reselectAbility = new AbstractAction() {
+				public void actionPerformed(ActionEvent ae) {
+					boolean reselectOption;
+					JComboBox menu = (JComboBox) ae.getSource();
+					String selectedItem = (String) menu.getSelectedItem();
+					if (selectedItem.equals("On")) {
+						reselectOption = true;
+					} else {
+						reselectOption = false;
+					}
+					System.out.println("Reselect Option" + reselectOption);
+					roundBeingPlayed.toggleReselect(reselectOption);
 				}
-				System.out.println("Reselect Option" + reselectOption);
-				roundBeingPlayed.toggleReselect(reselectOption);
+			};
+			for (int elementCounter = 0; elementCounter < 310; elementCounter++) {
+				result += " ";
 			}
-		};
-		for (int elementCounter = 0; elementCounter < 310; elementCounter++) {
-			result += " ";
+			String[] backgroundOptions = { "Default", "Windows", "Puppy", "Cats", "Snow", "Rain", "Space", "Valley" };
+			String[] reselectOptions = { "Off", "On" };
+			roundBeingPlayed.toggleReselect(false); // Off by default
+			JComboBox backgroundList = new JComboBox(backgroundOptions);
+			JComboBox reselectMenu = new JComboBox(reselectOptions);
+			reselectMenu.addActionListener(reselectAbility);
+			backgroundList.addActionListener(menuAction);
+			JLabel backgroundSelection = new JLabel("Background: ");
+			JLabel reselectSelection = new JLabel("    Reselect Messages: ");
+			JLabel spaceInMenu = new JLabel(result);
+			menuList.add(backgroundSelection);
+			backgroundSelection.setVisible(true);
+			menuList.add(backgroundList);
+			menuList.add(reselectSelection);
+			menuList.add(reselectMenu);
+			menuList.add(spaceInMenu);
+			menuList.add(new JLabel("A Key-Reselect"));
+			menuList.add(new JLabel("                    "));
+			spaceInMenu.setVisible(true);
+			backgroundList.setVisible(true);
+			pictures.add(menuList, new Integer(10));
+			menuList.setBounds(0, 0, 1200, 25);
+			menuList.setVisible(true);
+			windowBackground.add(pictures);
+			pictures.repaint();
+			windowBackground.repaint();
 		}
-		String[] backgroundOptions = { "Default", "Windows", "Puppy", "Cats", "Snow", "Rain", "Space", "Valley" };
-		String[] reselectOptions = { "Off", "On" };
-		roundBeingPlayed.toggleReselect(false); // Off by default
-		JComboBox backgroundList = new JComboBox(backgroundOptions);
-		JComboBox reselectMenu = new JComboBox(reselectOptions);
-		reselectMenu.addActionListener(reselectAbility);
-		backgroundList.addActionListener(menuAction);
-		JLabel backgroundSelection = new JLabel("Background: ");
-		JLabel reselectSelection = new JLabel("    Reselect Messages: ");
-		JLabel spaceInMenu = new JLabel(result);
-		menuList.add(backgroundSelection);
-		backgroundSelection.setVisible(true);
-		menuList.add(backgroundList);
-		menuList.add(reselectSelection);
-		menuList.add(reselectMenu);
-		menuList.add(spaceInMenu);
-		menuList.add(new JLabel("A Key-Reselect"));
-		menuList.add(new JLabel("                    "));
-		spaceInMenu.setVisible(true);
-		backgroundList.setVisible(true);
-		pictures.add(menuList, new Integer(10));
-		menuList.setBounds(0, 0, 1200, 25);
-		menuList.setVisible(true);
-		windowBackground.add(pictures);
-		pictures.repaint();
-		windowBackground.repaint();
 	}
 	/**
 	 * 
@@ -677,10 +705,12 @@ public class Window {
 	}
 
 	public void addStaticObject(JComponent object) {
-		pictures.add(object, new Integer(20));
-		windowBackground.add(pictures);
-		pictures.repaint();
-		windowBackground.repaint();
+		if (humanPlayers || continueScreen) {
+			pictures.add(object, new Integer(20));
+			windowBackground.add(pictures);
+			pictures.repaint();
+			windowBackground.repaint();
+		}
 	}
 
 }

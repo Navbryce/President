@@ -34,11 +34,11 @@ public class Round {
 	private Window main;
 
 	Round(int[] previousFinished, Player[] playerObjects, String rootPath){
-		main = new Window(0, this, rootPath);
 		players = playerObjects;
+		main = new Window(0, this, rootPath, playerNeedsGUI());
 		main.addMenu();
 		createHands();
-		mainLog = new EventLog();
+		mainLog = new EventLog(playerNeedsGUI());
 		eventLogHolder=new PictureJLayeredPane(825, 25, mainLog, rootPath);
 		eventLogHolder.draw("logBackground.jpg", 0, 0, 1);
 		main.addStaticObject(eventLogHolder);

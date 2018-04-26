@@ -15,12 +15,12 @@ public class Etre {
 	private int[] scores = {0, 0, 0, 0};
 	private String rootPath = "C:\\Users\\navba\\git\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
-	private int numberOfGamesToPlay = 10;
+	private int gamesIncrement = 100;
 	public static void main(String args[]){
 		new Etre();
 	}
 	Etre(){
-		// Strategies
+		// Strategies (Set a player equal to null to use a human strategy)
 		players[0] = new RandomStrategy("Random Strategy", null);
 		players[1] = new RandomStrategy("Random Strategy1", null);
 		players[2] = new RandomStrategy("Random Strategy2", null);
@@ -37,9 +37,10 @@ public class Etre {
 		Round currentRound;
 		Window continueWindow;
 		boolean completedGame=false;
-		Window nameInput = new Window(4, rootPath);
+		Window nameInput = new Window(4, rootPath, playerNeedsGUI());
 		setNames(nameInput.getNames(players));
 		nameInput.disposeWindow();
+		int numberOfGamesToPlay = gamesIncrement;
 		do{
 			numberOfGamesPlayed++;
 			numberOfGamesToPlay--;
@@ -47,8 +48,11 @@ public class Etre {
 			finishedArray=currentRound.getFinishedArray();
 			processScores(finishedArray); // Update scores
 			if (numberOfGamesToPlay <= 0) {
-				continueWindow = new Window(3, rootPath);
+				continueWindow = new Window(3, rootPath, playerNeedsGUI());
 				completedGame=continueWindow.continueScreen(getNamesRanksList());
+				if (completedGame) {
+					numberOfGamesToPlay = gamesIncrement;
+				}
 				continueWindow.disposeWindow();
 			} else {
 				completedGame = true;
@@ -75,6 +79,15 @@ public class Etre {
 	}
 	public Player player (int turnNumber) {
 		return players[convertTurnNumber(turnNumber)];
+	}
+	public boolean playerNeedsGUI () { // players who are null at the start of the game are human players
+		boolean GUI = false;
+		for (Player player: players) {
+			if (player == null || player.useGUI()) {
+				break;
+			}
+		}
+		return GUI;
 	}
 	public String getName (int turnNumber) {
 		return(player(turnNumber).getName());
