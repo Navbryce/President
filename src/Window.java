@@ -422,7 +422,7 @@ public class Window {
 		continueEtreAtomic.set(false);
 		JPanel continuePanel = new JPanel();
 		continuePanel.setLayout(new BoxLayout(continuePanel, BoxLayout.PAGE_AXIS));
-		continuePanel.setBounds(windowBackground.getWidth() / 2 - 200, windowBackground.getHeight() / 2, 800, 100);
+		continuePanel.setBounds(windowBackground.getWidth() / 2 - 300, windowBackground.getHeight() / 2, 800, 100);
 		for (int elementCounter = 0; elementCounter < nameRankList.size(); elementCounter++) {
 			JLabel text = new JLabel(nameRankList.get(elementCounter));
 			continuePanel.add(text);
