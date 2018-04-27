@@ -131,7 +131,8 @@ public class StrategyOne extends ComputerPlayer {
 	@Override
 	public int requestCard(ArrayList<Card> cardsAlreadyRequested) {
 		// TODO Auto-generated method st
-		return (int)(Math.random() * 13);
+		
+		return (int)(Math.random() * 13 );
 	}
 
 }
