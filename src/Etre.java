@@ -9,6 +9,7 @@ import Players.ComputerPlayer;
 import Players.HumanPlayer;
 import Players.Player;
 import Players.RandomStrategy;
+import Players.StrategyOne;
 public class Etre {
 	private int[] finishedArray={-1,0,0,0};
 	private Player[] players = new Player[4];
@@ -97,7 +98,7 @@ public class Etre {
 	}
 	public ArrayList<String> getNamesRanksList(){
 		ArrayList<String> resultList = new ArrayList();
-		resultList.add("The Ranks and Scores after " + numberOfGamesPlayed + " game(s) are:");
+		resultList.add("The Ranks (from the most recently played game) and Scores after " + numberOfGamesPlayed + " game(s) are:");
 		resultList.add("The President is: " + getName(finishedArray[0]) + getScoreString(finishedArray[0]));
 		resultList.add("The Vice-President is: " + getName(finishedArray[1]) + getScoreString(finishedArray[1]));
 		resultList.add("The Vice-President's Helper is: " + getName(finishedArray[2]) + getScoreString(finishedArray[2]));

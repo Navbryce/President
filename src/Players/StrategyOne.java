@@ -125,10 +125,11 @@ public class StrategyOne extends ComputerPlayer {
 		return answer;
 	}
 
+
 	@Override
-	public int requestCard(ArrayList<Card> cardsAlreadyRequested) {
+	public int requestCard (ArrayList<Card> cardsAlreadyRequested) {
 		// TODO Auto-generated method stub
-		return 0;
+		return (int)(Math.random() * 13);
 	}
 
 }
