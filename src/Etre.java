@@ -14,7 +14,7 @@ public class Etre {
 	private int[] finishedArray={-1,0,0,0};
 	private Player[] players = new Player[4];
 	private int[] scores = {0, 0, 0, 0};
-	private String rootPath = "C:\\Users\\navba\\git\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
+	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
 	private int gamesIncrement = 100;
 	public static void main(String args[]){
@@ -22,17 +22,10 @@ public class Etre {
 	}
 	Etre(){
 		// Strategies (Set a player equal to null to use a human strategy)
-		players[0] = new RandomStrategy("Random Strategy", null);
-		players[1] = new RandomStrategy("Random Strategy1", null);
-		players[2] = new RandomStrategy("Random Strategy2", null);
-		players[3] = new RandomStrategy("Random Strategy3", null);
-	
-		/*
-		players[0] = new HumanPlayer("Bryce", null);
-		players[1] = new HumanPlayer("Bob", null);
-		players[2] = new HumanPlayer("Joe", null);
-		*/
-		// players[3] = new HumanPlayer("Anne", null);
+		players[0] = new RandomStrategy("Random Strategy 0", null);
+		players[1] = new RandomStrategy("Random Strategy 1", null);
+		players[2] = new RandomStrategy("Random Strategy 2", null);
+		players[3] = new RandomStrategy("Random Strategy 3", null);
 
 		
 		Round currentRound;

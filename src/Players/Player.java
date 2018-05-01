@@ -17,4 +17,20 @@ public abstract class Player {
 	}
 	
 	public abstract boolean useGUI ();
+	
+	/**
+	 * 
+	 * @param cardValue
+	 * @return an arraylist of all indexes for the card value
+	 */
+	public ArrayList<Integer> cardIndexes (int cardValue) {
+		ArrayList<Integer> cardIndexes = new ArrayList();
+		for (int cardCounter = 0; cardCounter < hand.size() && (cardIndexes.size() < 4); cardCounter++) { 
+			Card card = hand.get(cardCounter);
+			if (cardValue == card.getValue()) {
+				cardIndexes.add(cardCounter);
+			}
+		}
+		return cardIndexes;
+	}
 }

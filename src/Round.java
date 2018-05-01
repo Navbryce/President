@@ -32,6 +32,8 @@ public class Round {
 	private int numberOfCards=1; //For example, 1 represents singles
 	private Deck mainDeck = new Deck();
 	private Window main;
+	private int cardPlayedOnTop = -1;
+	private int numberOfSetOnTop = 0;
 
 	Round(int[] previousFinished, Player[] playerObjects, String rootPath){
 		players = playerObjects;
@@ -121,9 +123,11 @@ public class Round {
 					cardCounter++;
 				}
 			}
-			if(cardCounter>=numberOfCards){
+			if (cardCounter>=numberOfCards){
 				playableCard=true;
-			}else if(infoA){
+			} else if (player.cardIndexes(cardPlayedOnTop).size() + numberOfSetOnTop == 4){ // potential complete
+				playableCard = true;
+			} else if(infoA){
 				System.out.println("You do not have enough of this card to play.");
 				if (player.useGUI()) {
 					new MessageBox("You do not have enough of this card to play. Please try again.", false, main, 1);
@@ -288,7 +292,7 @@ public class Round {
 	public void playCard(Card cardBeingPlayed, int turnNumber){
 		int elementCounter=0;
 		int cardRemoveCounter=0;
-		ArrayList<Card> hand=playerFind(turnNumber);
+		ArrayList<Card> hand = playerFind(turnNumber);
 		if(cardBeingPlayed.getValue()==2){ //When a 2 is played
 			System.out.println("Note: A single two can be played at any time. You can't play double or triple twos.");
 			for(int elementTwoCounter=0; cardRemoveCounter<1; elementTwoCounter++){
@@ -301,15 +305,38 @@ public class Round {
 			}
 
 		}else{ //When any card other than a 2 is played
-			do{
-				if(hand.get(elementCounter).getValue()==cardBeingPlayed.getValue()){
-					hand.get(elementCounter).setTurn(turnNumber);
-					playedDeck.add(hand.remove(elementCounter));
-					cardRemoveCounter++;
-					elementCounter=-1;
+			Player player = player(turnNumber);
+
+			ArrayList<Integer> cardIndexes = player.cardIndexes(cardBeingPlayed.getValue());  // arraylist of cards with cardBeingPlayed.value
+	
+			boolean potentialComplete = cardBeingPlayed.getValue() == cardPlayedOnTop; // cardPlayedOnTop is the last card played // It is possible the card will complete the set
+			if (potentialComplete) {
+				System.out.println("COMPLETETING...");
+				potentialComplete = potentialComplete && (cardIndexes.size() + numberOfSetOnTop == 4); // a complete set exists
+			}
+			int numberToRemove;
+			if (potentialComplete) {
+				numberToRemove = cardIndexes.size(); // Remove all the cards because it is going to try to complete
+			} else {
+				numberToRemove = numberOfCards;
+			}
+			System.out.println("NUMBER TO REMOVE: " + numberToRemove);
+			// Remove the cards. Start from the bottom and go to the top because if you remove the lowest indexes first, all of the other indexes will shift down. If you start from the highest index and remove the cards, you won't have to account for the "shift down"
+			for (int removeCounter = cardIndexes.size() - 1; removeCounter >= cardIndexes.size() - numberToRemove; removeCounter--) {
+				System.out.println("SIZE:" + cardIndexes.size());
+				int cardIndex = cardIndexes.get(removeCounter);
+				Card card = hand.get(cardIndex);
+				card.setTurn(turnNumber); // so the game knows who the card belongs to
+				hand.remove(cardIndex);
+				playedDeck.add(card); // play card
+				if (cardPlayedOnTop == -1 || card.getValue() == cardPlayedOnTop) { // if the card played on top has not been set or 
+					numberOfSetOnTop++;
+				} else { // it's a new value that overrides an old value
+					numberOfSetOnTop = 1;
 				}
-				elementCounter++;
-			}while((cardRemoveCounter<numberOfCards) && elementCounter<hand.size());
+				cardPlayedOnTop = card.getValue();
+
+			}
 		}
 		System.out.println("\n" + findName(turnNumber)+ " has played " + cardBeingPlayed.getName());
 		//new MessageBox(findName(turnNumber)+ " has played " + numberOfCardsToPlay()+ " of " + cardBeingPlayed.getName(), false, main, 1);
