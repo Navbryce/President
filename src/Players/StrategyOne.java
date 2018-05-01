@@ -44,12 +44,16 @@ public class StrategyOne extends ComputerPlayer {
 	@Override
 	protected int playCardProtected(ArrayList<Card> cardsAlreadyPlayed, int numberOfCards,
 			ArrayList<Card> protectedHand) {
+		for(int i=0;i<protectedHand.size();i++){
+			System.out.print(protectedHand.get(i).getValue() + " ");
+		}
+		System.out.println();
 		//if strategy has the first turn at the start of the round, it playes its lowest card that isn't a 2
 		if(cardsAlreadyPlayed.size() == 0) {
 			int answerIndex = 0;
 			boolean end = false;
-			for(int i=0;i<hand.size() && !end;i++) {
-				if(hand.get(i).getValue() != 2){
+			for(int i=0;i<protectedHand.size() && !end;i++) {
+				if(protectedHand.get(i).getValue() != 2){
 					answerIndex = i;
 					end = true;
 				}
@@ -59,17 +63,17 @@ public class StrategyOne extends ComputerPlayer {
 			ArrayList<Integer>[] cardSets = new ArrayList[]{new ArrayList(),new ArrayList(),new ArrayList(),new ArrayList()};
 					
 			//sort hand into singles, doubles, triples, and quadrouples
-			int previousCardValue = hand.get(0).getValue();
+			int previousCardValue = protectedHand.get(0).getValue();
 			int count = 1;
-			for(int i=1;i<hand.size();i++) {
-				int currentCardValue = hand.get(i).getValue();
+			for(int i=1;i<protectedHand.size();i++) {
+				int currentCardValue = protectedHand.get(i).getValue();
 				if(currentCardValue == previousCardValue) {
 					count++;
 				}else {
 					cardSets[count-1].add(previousCardValue);
 					previousCardValue = currentCardValue;
 					count = 1;
-					if(i==hand.size()-1){
+					if(i==protectedHand.size()-1){
 						cardSets[0].add(currentCardValue);
 					}
 				}
@@ -83,9 +87,11 @@ public class StrategyOne extends ComputerPlayer {
 			boolean end = false;
 			int lastCardPlayed = cardsAlreadyPlayed.get(cardsAlreadyPlayed.size()-1).getValue();
 			while(answerValue == 0 && !end) {
-				for(int i=0;i<cardSets[numberOfCards-1].size();i++) {
+				boolean stop = false;
+				for(int i=0;i<cardSets[numberOfCards-1].size() && !stop;i++) {
 					if(cardSets[numberOfCards-1].get(i)==lastCardPlayed) {
 						answerValue = cardSets[numberOfCards-1].get(i);
+						stop = true;
 					}
 				}
 				if(lastCardPlayed == 14) {
@@ -94,19 +100,20 @@ public class StrategyOne extends ComputerPlayer {
 				lastCardPlayed++;
 			}
 			if(end) {
-				for(int i=0;i<hand.size();i++){
-					if(hand.get(i).getValue() == 2){
+				for(int i=0;i<protectedHand.size();i++){
+					if(protectedHand.get(i).getValue() == 2){
 						answerValue = 2;
 					}
 				}
 				if(answerValue==0){
-					return hand.size();
+					return protectedHand.size();
 				}
 			}
+			//System.out.println("STRATEGY ONE ANSWER: "+answerValue);
 			//answerIndex - index in the hand of the card being played 
 			int answerIndex = 0;
-			for(int i=0;i<hand.size();i++) {
-				if(hand.get(i).getValue() == answerValue){
+			for(int i=0;i<protectedHand.size();i++) {
+				if(protectedHand.get(i).getValue() == answerValue){
 					answerIndex = i;
 				}
 			}	
@@ -117,22 +124,61 @@ public class StrategyOne extends ComputerPlayer {
 	@Override
 	protected RoundStart startRoundProtected(ArrayList<Card> hand) {
 		RoundStart answer = null;
-		for(int i=0;i<hand.size();i++){
+		boolean end = false;
+		for(int i=0;i<hand.size() && !end;i++){
 			if(hand.get(i).getValue() != 2){
 				answer =  new RoundStart(1,i);
+				end = true;
 			}
-		}
-		if(answer==null){
-			answer = new RoundStart(1,0);
 		}
 		return answer;
 	}
 
 	@Override
 	public int requestCard(ArrayList<Card> cardsAlreadyRequested) {
-		// TODO Auto-generated method st
+		ArrayList<Integer>[] cardSets = new ArrayList[]{new ArrayList(),new ArrayList(),new ArrayList(),new ArrayList()};
 		
-		return (int)(Math.random() * 13 );
+		//sort hand into singles, doubles, triples, and quadrouples
+		int previousCardValue = hand.get(0).getValue();
+		int count = 1;
+		for(int i=1;i<hand.size();i++) {
+			int currentCardValue = hand.get(i).getValue();
+			if(currentCardValue == previousCardValue) {
+				count++;
+			}else {
+				cardSets[count-1].add(previousCardValue);
+				previousCardValue = currentCardValue;
+				count = 1;
+				if(i==hand.size()-1){
+					cardSets[0].add(currentCardValue);
+				}
+			}
+		}
+		int answer = 0;
+		boolean end = false;
+		int counter = 3;
+		while(!end && counter >=0){
+			for(int i=0;i<cardSets[counter].size() && !end;i++){
+				boolean equal = false;
+				for(int x=0;x<cardsAlreadyRequested.size();x++){
+					if(cardSets[counter].get(i) == cardsAlreadyRequested.get(i).getValue()){
+						equal = true;
+					}
+				}
+				if(!equal){
+					end = true;
+					answer = i;
+				}
+			}
+		}
+		int answerIndex = 0;
+		for(int i=0;i<hand.size();i++){
+			if(answer == hand.get(i).getValue()){
+				answer = i;
+			}
+		}
+		return answerIndex;
 	}
 
 }
+
