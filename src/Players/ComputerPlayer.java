@@ -14,6 +14,45 @@ public abstract class ComputerPlayer extends Player {
 	
 	/**
 	 * 
+	 * @param cardsInput - the cards to make the map from
+	 * @return - each key in the map represents a value of card (so the keys should range from 2-14. The value is an ArrayList of all cards' indexes with that value
+	 */
+	public HashMap <Integer, ArrayList<Integer>> getCardMap (ArrayList<Card> cardsInput) {
+		ArrayList<Card> cards = (ArrayList<Card>) cardsInput.clone();
+		HashMap <Integer, ArrayList<Integer>> cardMap = new HashMap();
+		for (int cardValueCounter = 2; cardValueCounter <= 14; cardValueCounter++) {
+			cardMap.put(cardValueCounter, new ArrayList <Integer>());
+		}
+		
+		int cardIndexCounter = 0;
+		for (Card card: cards) {
+			ArrayList<Integer> cardValueList = cardMap.get(card.getValue()); // get the arraylist stored in the map associated with the value
+			cardValueList.add(cardIndexCounter); // Add the index of the card in the hand
+			cardIndexCounter++;
+		}
+		return cardMap;
+	}
+	
+	/**
+	 * @param minimum - the MINIMUM value the card returned has to be (includes this value)
+	 * @return the value of the least significant card in your hand (NOT the index)
+	 */
+	public int getMinimumCardValue (int minimum) { // assumes hand is sorted
+		int minimumValue = -1;
+		int cardIndexCounter = 0;
+		while (cardIndexCounter < this.hand.size() && (minimumValue == -1 || minimumValue == 2)) { // break loop when it finds the minimum possible card
+			// all hands are sorted, so the lowest value of card should be at the start UNLESS the card is a bomb. If it is a bomb, keep searching
+			int cardValue = this.hand.get(cardIndexCounter).getValue();
+			if (cardValue >= minimum || cardValue == 2) {
+				minimumValue = cardValue;
+			}
+			cardIndexCounter++;
+		}
+		return minimumValue;
+	}
+	
+	/**
+	 * 
 	 * @return the card from the player's hand to trade. giveCardProtected is sent a copy of the player's hand
 	 */
 	public int giveCard () {
@@ -64,25 +103,6 @@ public abstract class ComputerPlayer extends Player {
 	 */
 	private ArrayList<Card> getProtectedHand () {
 		return (ArrayList<Card>)this.hand.clone();
-	}
-	
-	/**
-	 * 
-	 * @param cardsInput - the cards to make the map from
-	 * @return - each key in the map represents a value of card (so the keys should range from 2-14. The value is an ArrayList of all cards with that value
-	 */
-	private HashMap <Integer, ArrayList<Card>> getCardMap (ArrayList<Card> cardsInput) {
-		ArrayList<Card> cards = (ArrayList<Card>) cardsInput.clone();
-		HashMap <Integer, ArrayList<Card>> cardMap = new HashMap();
-		for (int cardValueCounter = 2; cardValueCounter <= 14; cardValueCounter++) {
-			cardMap.put(cardValueCounter, new ArrayList <Card>());
-		}
-		
-		for (Card card: cardsInput) {
-			ArrayList<Card> cardValueList = cardMap.get(card.getValue());
-			cardValueList.add(card);
-		}
-		return cardMap;
 	}
 	
 }

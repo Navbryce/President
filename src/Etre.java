@@ -10,19 +10,20 @@ import Players.HumanPlayer;
 import Players.Player;
 import Players.RandomStrategy;
 import Players.StrategyOne;
+import Players.StrategyTwo;
 public class Etre {
 	private int[] finishedArray={-1,0,0,0};
 	private Player[] players = new Player[4];
 	private int[] scores = {0, 0, 0, 0};
 	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
-	private int gamesIncrement = 100;
+	private int gamesIncrement = 200;
 	public static void main(String args[]){
 		new Etre();
 	}
 	Etre(){
 		// Strategies (Set a player equal to null to use a human strategy)
-		players[0] = new RandomStrategy("Random Strategy 0", null);
+		players[0] = new StrategyTwo("Bryce Strategy", null);
 		players[1] = new RandomStrategy("Random Strategy 1", null);
 		players[2] = new RandomStrategy("Random Strategy 2", null);
 		players[3] = new RandomStrategy("Random Strategy 3", null);
