@@ -33,4 +33,11 @@ public abstract class Player {
 		}
 		return cardIndexes;
 	}
+		public static void printHand (ArrayList<Card> hand) {
+
+		for (Card card: hand) {
+			System.out.println(card.getName());
+		}
+	}
+
 }

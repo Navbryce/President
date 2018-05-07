@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Cards.Card;
+import Cards.RoundInfo;
 import Cards.RoundStart;
 
 public abstract class ComputerPlayer extends Player {
@@ -43,7 +44,7 @@ public abstract class ComputerPlayer extends Player {
 		while (cardIndexCounter < this.hand.size() && (minimumValue == -1 || minimumValue == 2)) { // break loop when it finds the minimum possible card
 			// all hands are sorted, so the lowest value of card should be at the start UNLESS the card is a bomb. If it is a bomb, keep searching
 			int cardValue = this.hand.get(cardIndexCounter).getValue();
-			if (cardValue >= minimum || cardValue == 2) {
+			if ((minimum != 2 && cardValue >= minimum) || cardValue == 2) {
 				minimumValue = cardValue;
 			}
 			cardIndexCounter++;
@@ -67,8 +68,8 @@ public abstract class ComputerPlayer extends Player {
 	 * @param numberOfCards - the number of cards that needs to be played
 	 * @return - the/a index of te card being played
 	 */
-	public int playCard (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards) {
-		return playCardProtected(cardsAlreadyPlayed, numberOfCards, getProtectedHand());
+	public int playCard (RoundInfo roundInfo) {
+		return playCardProtected(roundInfo, getProtectedHand());
 	}
 	/**
 	 * same as above, but the hand parameter is protected meaning it is a clone of the actual hand
@@ -77,7 +78,7 @@ public abstract class ComputerPlayer extends Player {
 	 * @param protectedHand
 	 * @return
 	 */
-	protected abstract int playCardProtected (ArrayList<Card> cardsAlreadyPlayed, int numberOfCards, ArrayList<Card> protectedHand);
+	protected abstract int playCardProtected (RoundInfo roundInfo, ArrayList<Card> protectedHand);
 	
 	/**
 	 * 
@@ -104,5 +105,7 @@ public abstract class ComputerPlayer extends Player {
 	private ArrayList<Card> getProtectedHand () {
 		return (ArrayList<Card>)this.hand.clone();
 	}
-	
+	public static void mian (String args[]) {
+		
+	}
 }

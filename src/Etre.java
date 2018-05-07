@@ -17,7 +17,7 @@ public class Etre {
 	private int[] scores = {0, 0, 0, 0};
 	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
-	private int gamesIncrement = 200;
+	private int gamesIncrement = 100;
 	public static void main(String args[]){
 		new Etre();
 	}

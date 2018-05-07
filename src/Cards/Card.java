@@ -124,4 +124,43 @@ public class Card {
 	public boolean getFinalCardPlayed(){
 		return isFinalCardPlayed;
 	}
+	
+	public static ArrayList sortHand(ArrayList<Card> hand){ //Sorts the hand
+		ArrayList<Card> leftOfPivot=new ArrayList();
+		ArrayList<Card> rightOfPivot=new ArrayList();
+		ArrayList<Card> sortedHand =new ArrayList();
+		int handSize=hand.size();
+		Card pivotCard=hand.get(0);
+		int pivotPoint=pivotCard.getValue();
+		for(int elementCounter=0; elementCounter<handSize; elementCounter++){
+			if(hand.get(elementCounter).getValue()<pivotPoint){
+				leftOfPivot.add(hand.get(elementCounter));
+			}else{
+				rightOfPivot.add(hand.get(elementCounter));
+			}
+		}
+		leftOfPivot=sortPivots(leftOfPivot); //After dividing the hand, it uses bubble sort
+		rightOfPivot=sortPivots(rightOfPivot); 
+
+		for(int elementCounter=0; elementCounter<leftOfPivot.size(); elementCounter++){ //Adds the cards back to the hand
+			sortedHand.add(leftOfPivot.get(elementCounter));
+		}
+		for(int elementCounter=0; elementCounter<rightOfPivot.size(); elementCounter++){ //Adds the cards back to the hands
+			sortedHand.add(rightOfPivot.get(elementCounter));
+		}
+		return sortedHand;
+
+	}
+	public static ArrayList sortPivots(ArrayList<Card> hand){ //Bubble Sort
+		for(int elementCounter1=0; elementCounter1<hand.size(); elementCounter1++){
+			for(int elementCounter2=0; elementCounter2<hand.size()-1; elementCounter2++){
+				if(hand.get(elementCounter2).getValue()>hand.get(elementCounter2+1).getValue()){
+					Card holder = hand.get(elementCounter2+1);
+					hand.set(elementCounter2+1, hand.get(elementCounter2));
+					hand.set(elementCounter2, holder);
+				}
+			}
+		}
+		return hand;
+	}
 }

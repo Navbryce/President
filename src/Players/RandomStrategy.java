@@ -3,6 +3,7 @@ package Players;
 import java.util.ArrayList;
 
 import Cards.Card;
+import Cards.RoundInfo;
 import Cards.RoundStart;
 
 public class RandomStrategy extends ComputerPlayer{
@@ -13,7 +14,7 @@ public class RandomStrategy extends ComputerPlayer{
 	}
 
 	@Override
-	protected int playCardProtected(ArrayList<Card> cardsAlreadyPlayed, int numberOfCards,
+	protected int playCardProtected(RoundInfo roundInfo,
 			ArrayList<Card> protectedHand) {
 		int cardIndex = getRandomCard(protectedHand);
 		// System.out.println("Random:" + cardIndex);

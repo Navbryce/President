@@ -11,6 +11,7 @@ import javax.swing.JLayeredPane;
 
 import Cards.Card;
 import Cards.Deck;
+import Cards.RoundInfo;
 import Cards.RoundStart;
 import Players.ComputerPlayer;
 import Players.Player;
@@ -23,7 +24,7 @@ public class Round {
 	PictureJLayeredPane eventLogHolder;
 	private Player[] players;
 	private EventLog mainLog;
-	private boolean finalCardPlayedByPlayer=false;
+	private boolean previousPlayerFinished=false;
 	private AtomicBoolean reselectMB = new AtomicBoolean(true);
 	private int[] finishedArray = {-1, -1, -1, -1};
 	private int[] previousFinishedArray;
@@ -47,12 +48,12 @@ public class Round {
 		previousFinishedArray=previousFinished;
 		printPreviousFinished();
 		do{
-
+			System.out.println(currentTurnNumber);
 			if(playedDeck.size()==0){
 				main.clearPlayedDeck();
 				main.drawTurnNumber(currentTurnNumber, findName(currentTurnNumber));
 				roundStart();
-			}else if((lastCardPlayed.getValue()==2 || completeSet(true) || currentTurnNumber==(lastCardPlayed.getTurnPlayedOn())) && !finalCardPlayedByPlayer){
+			}else if(lastCardPlayed.getValue()==2 || completeSet(true) || (!previousPlayerFinished && currentTurnNumber==(lastCardPlayed.getTurnPlayedOn()))){
 				main.clearWindow();
 				mainLog.clearLog();
 				eventLogHolder.updateSize();
@@ -65,9 +66,8 @@ public class Round {
 				// System.out.println(currentTurnNumber);
 				playerCardSelect();
 			}
-			if(finalCardPlayedByPlayer){
-				finalCardPlayedByPlayer=false;
-				lastCardPlayed.setTurn(currentTurnNumber);
+			if(previousPlayerFinished){ // This variable is set to true when a player finishes. It will become false after the next player's t urn
+				previousPlayerFinished=false;
 			}
 			if(playerFind(currentTurnNumber).size()==0 && !turnNumberCompleted(currentTurnNumber)){
 				playerCompletedRound();
@@ -125,7 +125,15 @@ public class Round {
 			}
 			if (cardCounter>=numberOfCards){
 				playableCard=true;
-			} else if (player.cardIndexes(cardPlayedOnTop).size() + numberOfSetOnTop == 4){ // potential complete
+			} else if (cardPlayed.getValue() == cardPlayedOnTop && player.cardIndexes(cardPlayed.getValue()).size() + numberOfSetOnTop == 4){ // potential complete if the player is trying to play the same card as a complete
+				/*
+				System.out.println();
+				System.out.println("PLayable because of completion");
+				System.out.println("TRYING TO PLAY: " + cardPlayed.getName());
+				System.out.println("ON TOP VALUE: " + cardPlayedOnTop);
+				System.out.println("NUMBER OF SET ON TOP: " + numberOfSetOnTop);
+				Player.printHand(player.hand);
+				*/
 				playableCard = true;
 			} else if(infoA){
 				System.out.println("You do not have enough of this card to play.");
@@ -303,15 +311,16 @@ public class Round {
 				}
 
 			}
+			cardPlayedOnTop = 2;
+			numberOfSetOnTop = 1;
 
 		}else{ //When any card other than a 2 is played
 			Player player = player(turnNumber);
+			
 
 			ArrayList<Integer> cardIndexes = player.cardIndexes(cardBeingPlayed.getValue());  // arraylist of cards with cardBeingPlayed.value
-	
 			boolean potentialComplete = cardBeingPlayed.getValue() == cardPlayedOnTop; // cardPlayedOnTop is the last card played // It is possible the card will complete the set
 			if (potentialComplete) {
-				System.out.println("COMPLETETING...");
 				potentialComplete = potentialComplete && (cardIndexes.size() + numberOfSetOnTop == 4); // a complete set exists
 			}
 			int numberToRemove;
@@ -320,11 +329,11 @@ public class Round {
 			} else {
 				numberToRemove = numberOfCards;
 			}
-			System.out.println("NUMBER TO REMOVE: " + numberToRemove);
+
 			// Remove the cards. Start from the bottom and go to the top because if you remove the lowest indexes first, all of the other indexes will shift down. If you start from the highest index and remove the cards, you won't have to account for the "shift down"
 			for (int removeCounter = cardIndexes.size() - 1; removeCounter >= cardIndexes.size() - numberToRemove; removeCounter--) {
-				System.out.println("SIZE:" + cardIndexes.size());
 				int cardIndex = cardIndexes.get(removeCounter);
+
 				Card card = hand.get(cardIndex);
 				card.setTurn(turnNumber); // so the game knows who the card belongs to
 				hand.remove(cardIndex);
@@ -348,53 +357,16 @@ public class Round {
 		}
 		lastCardPlayed=playedDeck.get(playedDeck.size()-1);
 	}
-	public ArrayList sortHand(ArrayList<Card> hand){ //Sorts the hand
-		ArrayList<Card> leftOfPivot=new ArrayList();
-		ArrayList<Card> rightOfPivot=new ArrayList();
-		ArrayList<Card> sortedHand =new ArrayList();
-		int handSize=hand.size();
-		Card pivotCard=hand.get(0);
-		int pivotPoint=pivotCard.getValue();
-		for(int elementCounter=0; elementCounter<handSize; elementCounter++){
-			if(hand.get(elementCounter).getValue()<pivotPoint){
-				leftOfPivot.add(hand.get(elementCounter));
-			}else{
-				rightOfPivot.add(hand.get(elementCounter));
-			}
-		}
-		leftOfPivot=sortPivots(leftOfPivot); //After dividing the hand, it uses bubble sort
-		rightOfPivot=sortPivots(rightOfPivot); 
 
-		for(int elementCounter=0; elementCounter<leftOfPivot.size(); elementCounter++){ //Adds the cards back to the hand
-			sortedHand.add(leftOfPivot.get(elementCounter));
-		}
-		for(int elementCounter=0; elementCounter<rightOfPivot.size(); elementCounter++){ //Adds the cards back to the hands
-			sortedHand.add(rightOfPivot.get(elementCounter));
-		}
-		return sortedHand;
-
-	}
 	/**
 	 * Sorts everybody's hands
 	 */
 	public void sortHands () {
 		for (Player player: players) {
-			sortHand(player.hand);
+			Card.sortHand(player.hand);
 		}
 	}
 
-	public ArrayList sortPivots(ArrayList<Card> hand){ //Bubble Sort
-		for(int elementCounter1=0; elementCounter1<hand.size(); elementCounter1++){
-			for(int elementCounter2=0; elementCounter2<hand.size()-1; elementCounter2++){
-				if(hand.get(elementCounter2).getValue()>hand.get(elementCounter2+1).getValue()){
-					Card holder = hand.get(elementCounter2+1);
-					hand.set(elementCounter2+1, hand.get(elementCounter2));
-					hand.set(elementCounter2, holder);
-				}
-			}
-		}
-		return hand;
-	}
 	public void playerCardSelect(){ //It is called when the player gets to play a card
 		boolean skipTurn=false;
 		ArrayList<Card> hand = new ArrayList();
@@ -432,8 +404,8 @@ public class Round {
 				}while(!main.getMessageBox());
 			} else {
 				currentPlayer = (ComputerPlayer) currentPlayer;
-				ArrayList<Card> copyOfPlayedDeck = (ArrayList<Card>)playedDeck.clone(); // clone the played deck so the ai can't modify it
-				valueIn = ((ComputerPlayer)currentPlayer).playCard(copyOfPlayedDeck, numberOfCards);
+				RoundInfo roundInfo = new RoundInfo(playedDeck, cardPlayedOnTop, numberOfSetOnTop, numberOfCards);
+				valueIn = ((ComputerPlayer)currentPlayer).playCard(roundInfo);
 			}
 
 			if(valueIn==hand.size()){
@@ -481,11 +453,15 @@ public class Round {
 	}
 
 	public void turnCalculate(){
-		do{
-			currentTurnNumber=(currentTurnNumber+1)%4;
-		}while(turnNumberCompleted(currentTurnNumber));
-
+		currentTurnNumber = nextTurn(currentTurnNumber);
 	}
+	public int nextTurn (int turnNumber) {
+		do{
+			turnNumber=(turnNumber+1)%4;
+		}while(turnNumberCompleted(turnNumber));
+		return turnNumber;
+	}
+	
 	public void completedGame(){ //Is called when the round is completed; it announces the ranks
 		int highestUnfilledLocation=-1;
 		for(int elementCounter=0; elementCounter<finishedArray.length && highestUnfilledLocation==-1; elementCounter++){
@@ -537,12 +513,20 @@ public class Round {
 		for (Player player: players) {
 			ArrayList<Card> hand = new ArrayList();
 			addHand(hand);
-			player.hand = sortHand(hand);
+			player.hand = Card.sortHand(hand);
 		}
 	}
 	public void clearTable(){ //Is called when a player clears the table
 		String clearedTheTableString = findName(lastCardPlayed.getTurnPlayedOn()) + "'s " + numberOfCardsToPlay() + " of " + lastCardPlayed.getNameWithoutSuit() + " clears the table";
 		String reason="";
+		
+		// Change the last card played and the number of set on top
+		cardPlayedOnTop = -1;
+		numberOfSetOnTop = 0;
+		if (previousPlayerFinished) { // if it is a card from the player who just completed the round, treat it like the next player's card
+			int turnNumber = lastCardPlayed.getTurnPlayedOn();
+			turnNumber = (turnNumber+1)%4;
+		}
 		if(lastCardPlayed.getValue()==2){
 			clearedTheTableString = findName(lastCardPlayed.getTurnPlayedOn()) + "'s two clears the table";
 			reason+="It is a two";
@@ -570,7 +554,7 @@ public class Round {
 
 	}
 	public void playerCompletedRound(){ //Adds the player to the appropriate ran
-		if(playedDeck.size()>0 && playedDeck.get(playedDeck.size()-1).getValue()==2){
+		if (playedDeck.size()>0 && playedDeck.get(playedDeck.size()-1).getValue()==2) {
 			int lowestUnfilledLocation=-1;
 			for(int elementCounter=finishedArray.length-1; elementCounter>=0 && lowestUnfilledLocation==-1; elementCounter--){
 				if(finishedArray[elementCounter]==-1){
@@ -582,7 +566,7 @@ public class Round {
 			//new MessageBox("Because " + findName(currentTurnNumber) + " ended on a two, they were placed in the lowest unfilled rank.", false, main, 1);
 			mainLog.addLine("Because " + findName(currentTurnNumber) + " ended on a two, they were placed in the lowest unfilled rank.");
 			eventLogHolder.updateSize();
-		}else{
+		} else {
 			int highestUnfilledLocation=-1;
 			for(int elementCounter=0; elementCounter<finishedArray.length && highestUnfilledLocation==-1; elementCounter++){
 				if(finishedArray[elementCounter]==-1){
@@ -596,8 +580,9 @@ public class Round {
 			eventLogHolder.updateSize();
 
 		}
-		finalCardPlayedByPlayer=true;
-		lastCardPlayed.finalCardPlayed();
+		previousPlayerFinished=true; // set to false after the next turn
+		lastCardPlayed.finalCardPlayed(); // Sets the finalCardPlayedVariable to true
+		lastCardPlayed.setTurn(nextTurn(currentTurnNumber)); // treat the card like the next player played it
 		System.out.println(findName(currentTurnNumber) + " has gotten rid of all of their cards. Congratulations!");
 		finishedCounter++;
 	}
@@ -731,6 +716,22 @@ public class Round {
 		}
 		return cardCounter;
 	}
+	/**
+	 * 
+	 * @param turnNumber
+	 * @return checks to see if the player is still in the game
+	 */
+	public boolean playerCompletedGame (int turnNumber) { 
+		boolean playerCompleted = false;
+		for (int turnCounter: finishedArray) {
+			playerCompleted = turnCounter == turnNumber;
+			if (playerCompleted) {
+				break;
+			}
+		}
+		return playerCompleted;
+	}
+	
 	public void toggleReselect(boolean toggle){
 		reselectMB.set(toggle);
 	}

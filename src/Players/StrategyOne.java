@@ -3,6 +3,7 @@ package Players;
 import java.util.ArrayList;
 
 import Cards.Card;
+import Cards.RoundInfo;
 import Cards.RoundStart;
 
 public class StrategyOne extends ComputerPlayer {
@@ -42,8 +43,10 @@ public class StrategyOne extends ComputerPlayer {
 	}
 
 	@Override
-	protected int playCardProtected(ArrayList<Card> cardsAlreadyPlayed, int numberOfCards,
+	protected int playCardProtected(RoundInfo roundInfo,
 			ArrayList<Card> protectedHand) {
+		ArrayList<Card> cardsAlreadyPlayed = roundInfo.lastCardsPlayed;
+		int numberOfCards = roundInfo.numberOfCards;
 		for(int i=0;i<protectedHand.size();i++){
 			System.out.print(protectedHand.get(i).getValue() + " ");
 		}
