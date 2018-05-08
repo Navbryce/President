@@ -363,7 +363,7 @@ public class Round {
 	 */
 	public void sortHands () {
 		for (Player player: players) {
-			Card.sortHand(player.hand);
+			player.hand = Card.sortHand(player.hand);
 		}
 	}
 
