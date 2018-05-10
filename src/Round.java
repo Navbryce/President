@@ -224,7 +224,8 @@ public class Round {
 		hand=playerFind(currentTurnNumber);
 		lastCardPlayed=new Card(1, 1);
 		if (playerNeedsGUI()) { // Draw everybody's hands EVEN if that player is computer if there is at LEAST one human player
-			main.drawHand(playerFind(currentTurnNumber));
+			main.drawHand(player.hand);
+			slowDown(player);
 		}
 		if (player.useGUI()) {
 			new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
@@ -383,7 +384,8 @@ public class Round {
 			new MessageBox(findName(currentTurnNumber) + ", it is your turn. Please select " + numberOfCardsToPlay() + " to play. Close the box to see your hand.", false, main, 1);
 		}
 		if (playerNeedsGUI()) { // If at least one player needs a GUI, draw all players' hands (even if they're a computer)
-			main.drawHand(playerFind(currentTurnNumber));
+			main.drawHand(currentPlayer.hand);
+			slowDown(currentPlayer);
 		}
 		do{
 			System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
@@ -731,7 +733,20 @@ public class Round {
 		}
 		return playerCompleted;
 	}
-	
+	/**
+	 * adds a delay if the player is a computer
+	 * @param the player of the current turn
+	 */
+	public void slowDown (Player player) {
+		if (!player.useGUI()) {
+			try {
+				Thread.sleep(1500); // sleep to artificially slow down the gui
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+	}
 	public void toggleReselect(boolean toggle){
 		reselectMB.set(toggle);
 	}

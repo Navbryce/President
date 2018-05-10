@@ -11,30 +11,64 @@ import Players.Player;
 import Players.RandomStrategy;
 import Players.StrategyOne;
 import Players.StrategyTwo;
+import Players.TradingStrategyOne;
 public class Etre {
 	private int[] finishedArray={-1,0,0,0};
-	private Player[] players = new Player[4];
 	private int[] scores = {0, 0, 0, 0};
 	private String rootPath = "Z:\\Computer Science 3-AP\\President\\Pictures\\"; // Path to pictures (include \\Pictures\\ in the path)
 	private int numberOfGamesPlayed = 0;
-	private int gamesIncrement = 100;
+	private Player[] players;
+	private int gamesIncrement;
 	public static void main(String args[]){
-		new Etre();
+		Player randomStrategy1 = new RandomStrategy("Random Strategy 1", null);
+		Player randomStrategy2 = new RandomStrategy("Random Strategy 2", null);
+		Player randomStrategy3 = new RandomStrategy("Random Strategy 3", null);
+		Player randomStrategy4 = new RandomStrategy("Random Strategy 4", null);
+		Player tradingStrategy = new TradingStrategyOne("Bryce Trading Strategy", null);
+		Player strategyTwo = new StrategyTwo("Bryce Strategy", null);
+		
+		LinkedList<String> gameResults = new LinkedList<String>();
+		int numberOfGames = 100;
+		
+		// Random game #1
+		Player[] players1 = {randomStrategy1, randomStrategy2, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players1, numberOfGames, false)).rankString());
+		
+		// Game #2
+		Player[] players2 = {strategyTwo, randomStrategy2, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players2, numberOfGames, false)).rankString());
+		
+		// Game #3
+		Player[] players3 = {randomStrategy1, strategyTwo, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players3, numberOfGames, false)).rankString());
+		
+		
+		
+		// Print every games results
+		int gameCounter = 1;
+		for (String result: gameResults) {
+			System.out.println("Game #" + gameCounter);
+			System.out.println(result);
+			System.out.println("\n"); // two lines down
+			gameCounter++;
+		}
+		
 	}
-	Etre(){
+	Etre(Player[] playersArray, int numberOfGamesInARound, boolean useContinueScreen){
 		// Strategies (Set a player equal to null to use a human strategy)
-		players[0] = new StrategyTwo("Bryce Strategy", null);
-		players[1] = new RandomStrategy("Random Strategy 1", null);
-		players[2] = new RandomStrategy("Random Strategy 2", null);
-		players[3] = new RandomStrategy("Random Strategy 3", null);
-
+		players = playersArray;
+		gamesIncrement = numberOfGamesInARound;
 		
 		Round currentRound;
 		Window continueWindow;
 		boolean completedGame=false;
-		Window nameInput = new Window(4, rootPath, playerNeedsGUI());
-		setNames(nameInput.getNames(players));
-		nameInput.disposeWindow();
+		
+		if (useContinueScreen || nullPlayer(players)) {
+			Window nameInput = new Window(4, rootPath, playerNeedsGUI());
+			setNames(nameInput.getNames(players));
+			nameInput.disposeWindow();
+		}
+
 		int numberOfGamesToPlay = gamesIncrement;
 		do{
 			numberOfGamesPlayed++;
@@ -43,14 +77,19 @@ public class Etre {
 			finishedArray=currentRound.getFinishedArray();
 			processScores(finishedArray); // Update scores
 			if (numberOfGamesToPlay <= 0) {
-				continueWindow = new Window(3, rootPath, playerNeedsGUI());
-				completedGame=continueWindow.continueScreen(getNamesRanksList());
-				if (completedGame) {
-					numberOfGamesToPlay = gamesIncrement;
+				if (useContinueScreen) { // if they don't want to use the continue screen, assume they're done once the game increment ends
+					continueWindow = new Window(3, rootPath, playerNeedsGUI());
+					completedGame=continueWindow.continueScreen(getNamesRanksList());
+					if (completedGame) {
+						numberOfGamesToPlay = gamesIncrement;
+					}
+					continueWindow.disposeWindow();
+				} else {
+					completedGame = false; // stop playing
 				}
-				continueWindow.disposeWindow();
+
 			} else {
-				completedGame = true;
+				completedGame = true; // keep playing
 			}
 		}while(completedGame);
 		
@@ -90,13 +129,52 @@ public class Etre {
 	public int getScore (int turnNumber) {
 		return scores[convertTurnNumber(turnNumber)];
 	}
+	/**
+	 * 
+	 * @return a sorted array where each element is a turn number. 0th index represents 1st place
+	 */
+	public int[] rankPlayers() { // ranks players from best to worse by turnNumber
+		ArrayList<Integer> turnNumbers = new ArrayList<Integer>();
+		turnNumbers.add(0);
+		turnNumbers.add(1);
+		turnNumbers.add(2);
+		turnNumbers.add(3);
+		int[] playerRanks = {-1, -1, -1, -1}; // 0th index - 1st place
+		for (int rankCounter = 0; rankCounter < playerRanks.length; rankCounter++) {
+			int minimum = -1;
+			int minimumTurnIndex = -1;
+			for (int turnCounter = 0; turnCounter < turnNumbers.size(); turnCounter++) {
+				int turnNumber = turnNumbers.get(turnCounter);
+				if (getScore(turnNumber) < minimum || minimum == -1) {
+					minimum = getScore(turnCounter);
+					minimumTurnIndex = turnCounter;
+				}
+			}
+			// minimum has been found. removed it from the array and add it to player ranks
+			int minimumTurnNumber = turnNumbers.remove(minimumTurnIndex);
+			playerRanks[rankCounter] = minimumTurnNumber;
+		}
+		return playerRanks;
+
+	}
+	
+	public String rankString () {
+		int[] ranks = rankPlayers();
+		String result = "Scores (Lower is better): \n";
+		int rankCounter = 1;
+		for (int turnNumber: ranks) {
+			result += rankCounter + ". " + getName(turnNumber) + ": " + getScoreString(turnNumber) + "\n";
+			rankCounter++;
+		}
+		return result;
+	}
 	public ArrayList<String> getNamesRanksList(){
 		ArrayList<String> resultList = new ArrayList();
 		resultList.add("The Ranks (from the most recently played game) and Scores after " + numberOfGamesPlayed + " game(s) are:");
-		resultList.add("The President is: " + getName(finishedArray[0]) + getScoreString(finishedArray[0]));
-		resultList.add("The Vice-President is: " + getName(finishedArray[1]) + getScoreString(finishedArray[1]));
-		resultList.add("The Vice-President's Helper is: " + getName(finishedArray[2]) + getScoreString(finishedArray[2]));
-		resultList.add("The President's Helper: " + getName(finishedArray[3]) + getScoreString(finishedArray[3]));
+		resultList.add("The President is: " + getName(finishedArray[0])+ ". " +  getScoreString(finishedArray[0]));
+		resultList.add("The Vice-President is: " + getName(finishedArray[1])+ ". " + getScoreString(finishedArray[1]));
+		resultList.add("The Vice-President's Helper is: " + getName(finishedArray[2])+ ". " + getScoreString(finishedArray[2]));
+		resultList.add("The President's Helper: " + getName(finishedArray[3]) + ". " + getScoreString(finishedArray[3]));
 		return resultList;
 	}
 	public void setNames(ArrayList<String> names){
@@ -107,10 +185,21 @@ public class Etre {
 		}
 	}
 	
+	public boolean nullPlayer (Player[] players) {
+		boolean nullPlayer = false;
+		for (Player player: players) {
+			if (player == null) {
+				nullPlayer = true;
+				break;
+			}
+		}
+		return nullPlayer;
+	}
+	
 	private String getScoreString (int playerNumber) {
 		double score = getScore(playerNumber);
 		double average = score / (double) numberOfGamesPlayed;
-		return ". The player's overall score is " + score +". His/her average position is " + average + ".";
+		return "The player's overall score is " + score +". His/her average position is " + average + ".";
 	}
 	/**
 	 * 
