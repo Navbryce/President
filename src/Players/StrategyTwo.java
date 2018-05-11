@@ -9,6 +9,7 @@ import Cards.RoundInfo;
 import Cards.RoundStart;
 
 public class StrategyTwo extends ComputerPlayer{
+	private boolean debug = false;
 
 	public StrategyTwo(String nameValue, ArrayList<Card> hand) {
 		super(nameValue, hand);
@@ -30,17 +31,22 @@ public class StrategyTwo extends ComputerPlayer{
 		HashMap<Integer, ArrayList<Integer>> cardMap = getCardMap(protectedHand);
 
 		int indexOfCardToPlay;
-		System.out.println("TOP CARD: " + minimumValue + "; numberOfCards: " + numberOfCards);
-		System.out.println("HAND: ");
-		Player.printHand(protectedHand);
+		if (debug) {
+			System.out.println("TOP CARD: " + minimumValue + "; numberOfCards: " + numberOfCards);
+			System.out.println("HAND: ");
+			Player.printHand(protectedHand);
+		}
 		if (numberOfCardsOnTop + cardMap.get(minimumValue).size() == 4) { // the strategy can complete the set 
 			indexOfCardToPlay = cardMap.get(minimumValue).get(0);
 		} else { // try to play the smallest value of card possible			
 			while ((cardMap.get(minimumValue).size() < numberOfCards && minimumValue != 2)) { // Keep searching until you get a minimum value with the right number of cards or a two
 				minimumValue = getMinimumCardValue(minimumValue + 1); // For some reason the previous minimum value didn't work, so it up it by 1.
-				System.out.println("MINIMUM VALUE: " + minimumValue);
+				if (debug) {
+					System.out.println("MINIMUM VALUE: " + minimumValue);
+				}
 			}
-			System.out.println("SELECTED:" + minimumValue + " with " + cardMap.get(minimumValue).size());
+			if (debug)
+				System.out.println("SELECTED:" + minimumValue + " with " + cardMap.get(minimumValue).size());
 			indexOfCardToPlay = cardMap.get(minimumValue).get(0); // returns the index of one of the cards you want to play
 		}
 		return indexOfCardToPlay;
@@ -56,7 +62,8 @@ public class StrategyTwo extends ComputerPlayer{
 		ArrayList<Integer> indexes = cardMap.get(minimumValue);
 		
 		RoundStart roundStart = new RoundStart(indexes.size(), indexes.get(0));
-		System.out.println("ROUND START for "+ getName() + ": " + roundStart.toString(protectedHand));
+		if (debug)
+			System.out.println("ROUND START for "+ getName() + ": " + roundStart.toString(protectedHand));
 
 		return roundStart;
 	}

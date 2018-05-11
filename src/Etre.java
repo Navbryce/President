@@ -24,8 +24,13 @@ public class Etre {
 		Player randomStrategy2 = new RandomStrategy("Random Strategy 2", null);
 		Player randomStrategy3 = new RandomStrategy("Random Strategy 3", null);
 		Player randomStrategy4 = new RandomStrategy("Random Strategy 4", null);
-		Player tradingStrategy = new TradingStrategyOne("Bryce Trading Strategy", null);
-		Player strategyTwo = new StrategyTwo("Bryce Strategy", null);
+		Player strategyTwo1 = new StrategyTwo("Bryce Strategy 1", null);
+		Player strategyTwo2 = new StrategyTwo("Bryce Strategy 2", null);
+		Player tradingStrategy1 = new TradingStrategyOne("Bryce Trading Strategy 1", null);
+		Player tradingStrategy2 = new TradingStrategyOne("Bryce Trading Strategy 2", null);
+
+
+
 		
 		LinkedList<String> gameResults = new LinkedList<String>();
 		int numberOfGames = 100;
@@ -34,20 +39,37 @@ public class Etre {
 		Player[] players1 = {randomStrategy1, randomStrategy2, randomStrategy3, randomStrategy4};
 		gameResults.add((new Etre(players1, numberOfGames, false)).rankString());
 		
-		// Game #2
-		Player[] players2 = {strategyTwo, randomStrategy2, randomStrategy3, randomStrategy4};
+		// Game #2 (Player #1 improvement?)
+		Player[] players2 = {strategyTwo1, randomStrategy2, randomStrategy3, randomStrategy4};
 		gameResults.add((new Etre(players2, numberOfGames, false)).rankString());
 		
-		// Game #3
-		Player[] players3 = {randomStrategy1, strategyTwo, randomStrategy3, randomStrategy4};
+		// Game #3 (Player #1 improvement)
+		Player[] players3 = {randomStrategy1, strategyTwo1, randomStrategy3, randomStrategy4};
 		gameResults.add((new Etre(players3, numberOfGames, false)).rankString());
+		
+		// Game #4
+		Player[] players4 = {strategyTwo1, strategyTwo2, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players4, numberOfGames, false)).rankString());
+		
+		// Game #5
+		Player[] players5 = {strategyTwo2, strategyTwo1, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players5, numberOfGames, false)).rankString());
+		
+		// Game 6 (Improved trading)
+		Player[] players6 = {randomStrategy1, tradingStrategy1, randomStrategy3, randomStrategy4};
+		gameResults.add((new Etre(players6, numberOfGames, false)).rankString());
+		
+		// Game 7 (Trading Strategies vs nonTrading Strategiess)
+		Player[] players7 = {strategyTwo1, tradingStrategy1, strategyTwo2, tradingStrategy2};
+		gameResults.add((new Etre(players7, numberOfGames, false)).rankString());
 		
 		
 		
 		// Print every games results
+		System.out.println("\n");
 		int gameCounter = 1;
 		for (String result: gameResults) {
-			System.out.println("Game #" + gameCounter);
+			System.out.println("Game #" + gameCounter + " with " + numberOfGames + " sub-games: ");
 			System.out.println(result);
 			System.out.println("\n"); // two lines down
 			gameCounter++;
@@ -73,7 +95,7 @@ public class Etre {
 		do{
 			numberOfGamesPlayed++;
 			numberOfGamesToPlay--;
-			currentRound=new Round(finishedArray, players, rootPath);
+			currentRound=new Round(finishedArray, players, rootPath, false); // set debug here
 			finishedArray=currentRound.getFinishedArray();
 			processScores(finishedArray); // Update scores
 			if (numberOfGamesToPlay <= 0) {
@@ -92,6 +114,7 @@ public class Etre {
 				completedGame = true; // keep playing
 			}
 		}while(completedGame);
+		System.out.println("An entire game with " + numberOfGamesInARound + " sub-games has completed.");
 		
 	}
 	public static boolean continueEtre(){

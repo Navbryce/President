@@ -18,6 +18,7 @@ import Players.Player;
 public class Round {
 	private int numberOfPlayers=4;
 	private ArrayList <Card> playedDeck=new ArrayList();
+	private boolean debug;
 	private int currentTurnNumber=1;
 	private Card lastCardPlayed;
 	ArrayList<Card> everyValueHand;
@@ -35,8 +36,17 @@ public class Round {
 	private Window main;
 	private int cardPlayedOnTop = -1;
 	private int numberOfSetOnTop = 0;
+	
 
-	Round(int[] previousFinished, Player[] playerObjects, String rootPath){
+	/**
+	 * 
+	 * @param previousFinished
+	 * @param playerObjects
+	 * @param rootPath
+	 * @param debug - if true, will also print game to console
+	 */
+	Round(int[] previousFinished, Player[] playerObjects, String rootPath, boolean debugParameter){
+		debug = debugParameter;
 		players = playerObjects;
 		main = new Window(0, this, rootPath, playerNeedsGUI());
 		main.addMenu();
@@ -48,7 +58,8 @@ public class Round {
 		previousFinishedArray=previousFinished;
 		printPreviousFinished();
 		do{
-			System.out.println(currentTurnNumber);
+			if (debug)
+				System.out.println(currentTurnNumber);
 			if(playedDeck.size()==0){
 				main.clearPlayedDeck();
 				main.drawTurnNumber(currentTurnNumber, findName(currentTurnNumber));
@@ -102,7 +113,8 @@ public class Round {
 			}
 		}
 		if(!playableCard){
-			System.out.println(findName(turnNumber) + " does not have anything in his or her hand that can beat a " + numberOfCardsToPlay() + " of " + lastCardPlayed.getName());
+			if (debug)
+				System.out.println(findName(turnNumber) + " does not have anything in his or her hand that can beat a " + numberOfCardsToPlay() + " of " + lastCardPlayed.getName());
 			//new MessageBox(findName(turnNumber) + " does not have anything in his or her hand that can beat a " + numberOfCardsToPlay() + " of " + lastCardPlayed.getName(), false, main, 1);
 			mainLog.addLine(findName(turnNumber) + " does not have anything in his or her hand that can beat a " + numberOfCardsToPlay() + " of " + lastCardPlayed.getName());
 			eventLogHolder.updateSize();
@@ -136,14 +148,16 @@ public class Round {
 				*/
 				playableCard = true;
 			} else if(infoA){
-				System.out.println("You do not have enough of this card to play.");
+				if (debug)
+					System.out.println("You do not have enough of this card to play.");
 				if (player.useGUI()) {
 					new MessageBox("You do not have enough of this card to play. Please try again.", false, main, 1);
 				}
 
 			}
 		}else if(infoA){
-			System.out.println(cardPlayed.getName() + " is not high enough. Remember, it must be greater than or equal to " + lastCardPlayed.getValue());
+			if (debug)
+				System.out.println(cardPlayed.getName() + " is not high enough. Remember, it must be greater than or equal to " + lastCardPlayed.getValue());
 			int cardCounter=0;
 			for(int elementCounter=0; elementCounter<hand.size(); elementCounter++){
 				if((hand.get(elementCounter)).getValue()==cardPlayed.getValue()){
@@ -155,7 +169,8 @@ public class Round {
 				numberOfCardsInHandResult=" And, you do not have enough of this card";
 			}
 			String message = cardPlayed.getName() + " is not high enough. Remember, it must be greater than or equal to " + lastCardPlayed.getName() +"." ;
-			System.out.println(message);
+			if (debug)
+				System.out.println(message);
 			if (player.useGUI()) {
 				new MessageBox(message, false, main, 2);
 			}
@@ -223,12 +238,14 @@ public class Round {
 		printHand(currentTurnNumber);
 		hand=playerFind(currentTurnNumber);
 		lastCardPlayed=new Card(1, 1);
-		if (playerNeedsGUI()) { // Draw everybody's hands EVEN if that player is computer if there is at LEAST one human player
+		if (player.useGUI() || (playerNeedsGUI() && debug)) { // Draw everybody's hands EVEN if that player is computer if there is at LEAST one human player and DEBUG mode is on
 			main.drawHand(player.hand);
-			slowDown(player);
 		}
 		if (player.useGUI()) {
 			new MessageBox(findName(currentTurnNumber) + ", click the number of cards you would like to play. Click anywhere to close these dialogue boxes.", false, main, 1);
+		} else if (playerNeedsGUI()){
+			slowDown(player);
+
 		}
 		do{
 			if (player.useGUI()) {
@@ -272,10 +289,12 @@ public class Round {
 					valueIn = roundStart.card;
 				}
 				if(valueIn<0 || valueIn>=hand.size()){
-					System.out.println("You did not enter an acceptable value. please try again.\n");
+					if (debug)
+						System.out.println("You did not enter an acceptable value. please try again.\n");
 					cardBeingPlayed=new Card(0, 1);
 				}else if(hand.get(valueIn).getValue()==2 && hand.size()>numberOfCardsOfValue(2, hand)){
-					System.out.println("You cannot use a two when no other cards have been played.");
+					if (debug)
+						System.out.println("You cannot use a two when no other cards have been played.");
 					if (player.useGUI()) {
 						new MessageBox("You can not use a two when no other cards have been played and said two is not your last card..", false, main, 1);
 					}
@@ -293,9 +312,11 @@ public class Round {
 
 	}
 	public void playedDeckPrint(){
-		System.out.println("\nThe following cards have been played: ");
-		for(int elementCounter=playedDeck.size()-1; elementCounter>=0; elementCounter--){
-			System.out.println(playedDeck.get(elementCounter).getName());
+		if (debug) {
+			System.out.println("\nThe following cards have been played: ");
+			for(int elementCounter=playedDeck.size()-1; elementCounter>=0; elementCounter--){
+				System.out.println(playedDeck.get(elementCounter).getName());
+			}
 		}
 	}
 	public void playCard(Card cardBeingPlayed, int turnNumber){
@@ -303,7 +324,9 @@ public class Round {
 		int cardRemoveCounter=0;
 		ArrayList<Card> hand = playerFind(turnNumber);
 		if(cardBeingPlayed.getValue()==2){ //When a 2 is played
-			System.out.println("Note: A single two can be played at any time. You can't play double or triple twos.");
+			if (debug) {
+				System.out.println("Note: A single two can be played at any time. You can't play double or triple twos.");
+			}
 			for(int elementTwoCounter=0; cardRemoveCounter<1; elementTwoCounter++){
 				if(hand.get(elementTwoCounter).getValue()==2){
 					hand.get(elementTwoCounter).setTurn(turnNumber);
@@ -348,13 +371,15 @@ public class Round {
 
 			}
 		}
-		System.out.println("\n" + findName(turnNumber)+ " has played " + cardBeingPlayed.getName());
+		if (debug) 
+			System.out.println("\n" + findName(turnNumber)+ " has played " + cardBeingPlayed.getName());
 		//new MessageBox(findName(turnNumber)+ " has played " + numberOfCardsToPlay()+ " of " + cardBeingPlayed.getName(), false, main, 1);
 		mainLog.addLine(findName(turnNumber)+ " has played " + numberOfCardsToPlay()+ " of " + cardBeingPlayed.getName());
 		eventLogHolder.updateSize();
 		if(cardBeingPlayed.getValue()==lastCardPlayed.getValue()){
 			skipTurn=true;
-			System.out.println("\n" + findName(currentTurnNumber) + "'s turn has been skipped.");
+			if (debug)
+				System.out.println("\n" + findName(currentTurnNumber) + "'s turn has been skipped.");
 		}
 		lastCardPlayed=playedDeck.get(playedDeck.size()-1);
 	}
@@ -379,16 +404,22 @@ public class Round {
 		Scanner inputValue = new Scanner(System.in);
 		playedDeckPrint();
 		printHand(currentTurnNumber);
-		System.out.println(hand.size() + ". Skip Turn");
+		if (debug) {
+			System.out.println(hand.size() + ". Skip Turn");
+		}
+
+		if (currentPlayer.useGUI() || (playerNeedsGUI() && debug)) { // If at least one player needs a GUI, draw all players' hands (even if they're a computer)
+			main.drawHand(currentPlayer.hand);
+		}
 		if (currentPlayer.useGUI()) {
 			new MessageBox(findName(currentTurnNumber) + ", it is your turn. Please select " + numberOfCardsToPlay() + " to play. Close the box to see your hand.", false, main, 1);
-		}
-		if (playerNeedsGUI()) { // If at least one player needs a GUI, draw all players' hands (even if they're a computer)
-			main.drawHand(currentPlayer.hand);
+		} else if (playerNeedsGUI()) {
 			slowDown(currentPlayer);
 		}
+
 		do{
-			System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
+			if (debug) 
+				System.out.print(findName(currentTurnNumber) + ", please select " + numberOfCardsToPlay() + " to play: ");
 			if (currentPlayer.useGUI()) { // a human player needs to use the GUI
 				boolean messageBoxVariable=false;
 				main.setMessageBox(messageBoxVariable);
@@ -420,12 +451,14 @@ public class Round {
 				cardBeingPlayed=hand.get(valueIn);
 				acceptableValue=true;
 			}else{
-				System.out.println("You did not enter an acceptable value. please try again.\n");
+				if (debug)
+					System.out.println("You did not enter an acceptable value. please try again.\n");
 				cardBeingPlayed=new Card(0, 1);
 			}
 		}while(!skipTurn && (!acceptableValue || !isPlayableCard(cardBeingPlayed, currentTurnNumber, acceptableValue, player(currentTurnNumber))));
 		if(skipTurn){
-			System.out.println("\n" + findName(currentTurnNumber) + " has chosen to skip his or her turn.");
+			if (debug)
+				System.out.println("\n" + findName(currentTurnNumber) + " has chosen to skip his or her turn.");
 		}else{
 			playCard(cardBeingPlayed, currentTurnNumber);	
 		}
@@ -448,7 +481,8 @@ public class Round {
 		if(playedDeck.size()>=4 && playedDeck.get(playedDeck.size()-1).getValue()==playedDeck.get(playedDeck.size()-2).getValue()&&playedDeck.get(playedDeck.size()-3).getValue()==playedDeck.get(playedDeck.size()-4).getValue() && playedDeck.get(playedDeck.size()-1).getValue()==playedDeck.get(playedDeck.size()-4).getValue()){
 			setComplete=true;
 			if(cInfo){
-				System.out.println("A set of " + playedDeck.get(playedDeck.size()-1).getName() + " has been complete.");
+				if (debug)
+					System.out.println("A set of " + playedDeck.get(playedDeck.size()-1).getName() + " has been complete.");
 			}
 		}
 		return setComplete;
@@ -499,8 +533,10 @@ public class Round {
 			messageList.add("President's Helper: " + findName(previousFinishedArray[3]));
 			messageList.add("\nTrading will now begin; the President will trade first. ");
 			
-			for (String message: messageList) {
-				System.out.println(message);
+			if (debug) {
+				for (String message: messageList) {
+					System.out.println(message);
+				}
 			}
 			if (playerNeedsGUI()) {
 				new MessageBox(messageList, false, main);
@@ -550,7 +586,8 @@ public class Round {
 		if(!turnNumberCompleted(lastCardPlayed.getTurnPlayedOn())){
 			currentTurnNumber=lastCardPlayed.getTurnPlayedOn()-1;
 		}else{
-			System.out.println(findName(lastCardPlayed.getTurnPlayedOn())+ "'s card has cleared the table. Because they completed the game, it will go to the player after them");
+			if (debug)
+				System.out.println(findName(lastCardPlayed.getTurnPlayedOn())+ "'s card has cleared the table. Because they completed the game, it will go to the player after them");
 			currentTurnNumber=lastCardPlayed.getTurnPlayedOn();
 		}
 
@@ -585,7 +622,8 @@ public class Round {
 		previousPlayerFinished=true; // set to false after the next turn
 		lastCardPlayed.finalCardPlayed(); // Sets the finalCardPlayedVariable to true
 		lastCardPlayed.setTurn(nextTurn(currentTurnNumber)); // treat the card like the next player played it
-		System.out.println(findName(currentTurnNumber) + " has gotten rid of all of their cards. Congratulations!");
+		if (debug)
+			System.out.println(findName(currentTurnNumber) + " has gotten rid of all of their cards. Congratulations!");
 		finishedCounter++;
 	}
 	public boolean hasCardInHand(Card cardRequested, int turnNumber, boolean message){
@@ -681,7 +719,7 @@ public class Round {
 			String message = findName(turnNumber1) + " took " + findName(turnNumber2) + "'s " + cardSelected1.getNameWithoutSuit() + ", in exchange for a(n) " + handOfTrader.get(valueIn).getNameWithoutSuit();
 			if (player1.useGUI()) {	
 				new MessageBox(message, false, main, 1);
-			} else {
+			} else if (debug) {
 				System.out.println(message);
 			}
 			handOfTrader.add(handOfReceiver.remove(indexOfCardWanted));
@@ -734,16 +772,14 @@ public class Round {
 		return playerCompleted;
 	}
 	/**
-	 * adds a delay if the player is a computer
+	 * adds a dela
 	 * @param the player of the current turn
 	 */
 	public void slowDown (Player player) {
-		if (!player.useGUI()) {
-			try {
-				Thread.sleep(1500); // sleep to artificially slow down the gui
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+		try {
+			Thread.sleep(1500); // sleep to artificially slow down the gui
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 
 	}

@@ -11,7 +11,8 @@ import Cards.Card;
  * This one focuses on giving the smallest possible card
  *
  */
-public class TradingStrategyOne extends StrategyTwo{
+public class TradingStrategyOne extends StrategyTwo {
+	private boolean debug = false;
 
 	public TradingStrategyOne(String nameValue, ArrayList<Card> hand) {
 		super(nameValue, hand);
@@ -20,7 +21,9 @@ public class TradingStrategyOne extends StrategyTwo{
 	protected int giveCardProtected(ArrayList<Card> hand) {
 		HashMap<Integer, ArrayList<Integer>> cardMap = getCardMap(hand);
 		int cardValue = getMinimumCardValue(-1);
-		System.out.println("Card Value to Give: " + cardValue);
+		if (debug) {
+			System.out.println("Card Value to Give: " + cardValue);
+		}
 		return cardMap.get(cardValue).get(0);
 	}
 }
