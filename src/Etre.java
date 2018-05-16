@@ -10,6 +10,7 @@ import Players.HumanPlayer;
 import Players.Player;
 import Players.RandomStrategy;
 import Players.StrategyOne;
+import Players.StrategyThree;
 import Players.StrategyTwo;
 import Players.TradingStrategyOne;
 public class Etre {
@@ -24,10 +25,15 @@ public class Etre {
 		Player randomStrategy2 = new RandomStrategy("Random Strategy 2", null);
 		Player randomStrategy3 = new RandomStrategy("Random Strategy 3", null);
 		Player randomStrategy4 = new RandomStrategy("Random Strategy 4", null);
-		Player strategyTwo1 = new StrategyTwo("Bryce Strategy 1", null);
-		Player strategyTwo2 = new StrategyTwo("Bryce Strategy 2", null);
-		Player tradingStrategy1 = new TradingStrategyOne("Bryce Trading Strategy 1", null);
-		Player tradingStrategy2 = new TradingStrategyOne("Bryce Trading Strategy 2", null);
+		Player strategyOne1 = new StrategyOne("Strategy One 1", null);
+		Player strategyOne2 = new StrategyOne("Strategy One 2", null);
+		Player strategyTwo1 = new StrategyTwo("Strategy Two 1", null);
+		Player strategyTwo2 = new StrategyTwo("Strategy Two 2", null);
+		Player strategyThree1 = new StrategyThree("Strategy Three 1", null);
+		Player strategyThree2 = new StrategyThree("Strategy Three 2", null);
+		Player tradingStrategy1 = new TradingStrategyOne("Trading Strategy 1", null);
+		Player tradingStrategy2 = new TradingStrategyOne("Trading Strategy 2", null);
+		
 
 
 
@@ -62,6 +68,10 @@ public class Etre {
 		// Game 7 (Trading Strategies vs nonTrading Strategiess)
 		Player[] players7 = {strategyTwo1, tradingStrategy1, strategyTwo2, tradingStrategy2};
 		gameResults.add((new Etre(players7, numberOfGames, false)).rankString());
+		
+		// Game 8
+		Player[] players8 = {randomStrategy1, randomStrategy2, strategyThree1, randomStrategy3};
+		gameResults.add((new Etre(players8, numberOfGames, false).rankString()));
 		
 		
 		
@@ -169,10 +179,11 @@ public class Etre {
 			for (int turnCounter = 0; turnCounter < turnNumbers.size(); turnCounter++) {
 				int turnNumber = turnNumbers.get(turnCounter);
 				if (getScore(turnNumber) < minimum || minimum == -1) {
-					minimum = getScore(turnCounter);
+					minimum = getScore(turnNumber);
 					minimumTurnIndex = turnCounter;
 				}
 			}
+
 			// minimum has been found. removed it from the array and add it to player ranks
 			int minimumTurnNumber = turnNumbers.remove(minimumTurnIndex);
 			playerRanks[rankCounter] = minimumTurnNumber;

@@ -29,13 +29,9 @@ public class StrategyThree extends ComputerPlayer{
 	}
 	protected int playCardProtected(RoundInfo roundInfo,ArrayList<Card> protectedHand) {
 		HashMap<Integer, ArrayList<Integer>> cards = getCardMap(hand);
-		for(int i=0;i<protectedHand.size();i++){
-			System.out.print(protectedHand.get(i).getValue() + " ");
-		}
-		System.out.println();
+
 		//check for a card that is the same as the last played card
 		int lastCard = roundInfo.lastCardsPlayed.get(roundInfo.lastCardsPlayed.size()-1).getValue();
-		System.out.println("LAST CARD: "+lastCard);
 		int answerIndex = 0;
 		if(cards.get(lastCard).size()!=0 && cards.get(lastCard).size() >= roundInfo.numberOfCards){
 			answerIndex = cards.get(lastCard).get(0);
